@@ -9,7 +9,10 @@ import (
 var DBCpm string
 
 func InitConfig() {
+	// set default variable
 	viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
+
+	// set config file
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
