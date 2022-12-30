@@ -1,9 +1,9 @@
 package main
 
 import (
+	"cpm-rad-backend/domain/config"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -12,8 +12,10 @@ import (
 )
 
 func main() {
-	dsn := "sqlserver://SA:" + url.QueryEscape("S#123456") + "@localhost:1433?database=CPM"
-	db, err := gorm.Open(sqlserver.Open(dsn), &gorm.Config{})
+	config.InitConfig()
+
+	fmt.Printf(config.DBCpm)
+	db, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
 	// Migrate the schema
 	if err != nil {
 		panic("failed to connect database")
