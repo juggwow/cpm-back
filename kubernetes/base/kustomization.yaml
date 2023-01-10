@@ -1,0 +1,11 @@
+resources:
+  - manifest.yaml
+  - secret.yaml
+vars:
+  - name: ING_NAME
+    objref:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      name: ${app_name}
+    fieldref:
+      fieldpath: metadata.name

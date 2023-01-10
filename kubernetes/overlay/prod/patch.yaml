@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${app_name}
+spec:
+  selector:
+    matchLabels:
+      app: ${app_name}
+  template:
+    metadata:
+      labels:
+        app: ${app_name}
+    spec:
+      containers:
+        - name: primary
+          env:
+            - name: env
+              value: prod
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 256Mi
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: ${app_name}
+spec:
+  rules:
+    - host: cpm-rad-ing-dev.pea.co.th
+      http:
+        paths:
+          - backend:
+              service:
+                name: ${app_name}
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix

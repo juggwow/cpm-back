@@ -1,0 +1,29 @@
+variables:
+  app_name: "cpm-rad" # change to your app e.g. cpm-rad
+  namespace: "devpool-rad" # change to your namespace e.g. devpool-rad
+
+include:
+  - project: "pea-developer/std/ci-cd"
+    ref: kustomize
+    file: "1-base-ci-template.yml"
+  - project: "pea-developer/std/ci-cd"
+    ref: kustomize
+    file: "2-docker-ci-template.yml"
+  - project: "pea-developer/std/ci-cd"
+    ref: kustomize
+    file: "3-deploy-test-ci-template.yml"
+  - project: "pea-developer/std/ci-cd"
+    ref: kustomize
+    file: "4-start-workflow-template.yml"
+  - project: "pea-developer/std/ci-cd"
+    ref: kustomize
+    file: "5-deploy-staging-ci-template.yml"
+  - project: "pea-developer/std/ci-cd"
+    ref: kustomize
+    file: "6-canary-ci-template.yml"
+  - project: "pea-developer/std/ci-cd"
+    ref: kustomize
+    file: "7-rollout-prod-ci-template.yml"
+  - project: "pea-developer/std/ci-cd"
+    ref: kustomize
+    file: "8-rollback-prod-ci-template.yml"
