@@ -65,6 +65,6 @@ func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
 	fmt.Print(db)
 
 	api.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.String(http.StatusOK, "Hello, World!!")
 	})
 }
