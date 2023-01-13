@@ -20,9 +20,9 @@ spec:
           ports:
             - containerPort: 80
               protocol: TCP
-          envFrom:
-            - secretRef:
-                name: ${app_name}-secret
+          # envFrom:
+          #   - secretRef:
+          #       name: ${app_name}-secret
           resources:
             limits:
               memory: 200Mi
