@@ -30,7 +30,7 @@ metadata:
   name: ${app_name}
 spec:
   rules:
-    - host: cpm-rad-api-ing-dev.pea.co.th
+    - host: cpm-rad-api-ing-prod.pea.co.th
       http:
         paths:
           - backend:
