@@ -22,7 +22,7 @@ func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
 	// set default variable
-	viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
+	viper.SetDefault("db.cpm", "sqlserver://sa:YourStrong@Passw0rd@localhost:1433?database=CPM")
 
 	viper.SetDefault("auth.callback.url", "http://localhost:3000")
 	viper.SetDefault("auth.client.id", "client_id")
