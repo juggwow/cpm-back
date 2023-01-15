@@ -7,7 +7,6 @@ import (
 	"cpm-rad-backend/domain/contract"
 	"cpm-rad-backend/domain/health_check"
 	"cpm-rad-backend/domain/logger"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -116,7 +115,7 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection) {
 
 func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
 
-	fmt.Print(db)
+	//fmt.Print(db)
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
 
 }

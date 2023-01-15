@@ -12,9 +12,9 @@ import (
 	"go.uber.org/zap"
 )
 
-type getByIDFunc func(context.Context, uint) (Contract, error)
+type getByIDFunc func(context.Context, int) (Contract, error)
 
-func (fn getByIDFunc) GetByID(ctx context.Context, ID uint) (Contract, error) {
+func (fn getByIDFunc) GetByID(ctx context.Context, ID int) (Contract, error) {
 	return fn(ctx, ID)
 }
 
@@ -28,8 +28,8 @@ func GetByIDHandler(svc getByIDFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.ResponseError{Error: err.Error()})
 		}
 
-		contract, err := svc.GetByID(c.Request().Context(), uint(ID))
-		zap.L().Sugar().Infof("job %d", ID)
+		contract, err := svc.GetByID(c.Request().Context(), ID)
+		zap.L().Sugar().Infof("work contract %d", ID)
 		if err != nil {
 			log.Error(err.Error())
 			return c.JSON(http.StatusNotFound, response.ResponseError{Error: err.Error()})
