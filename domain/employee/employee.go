@@ -2,7 +2,6 @@ package employee
 
 import (
 	"cpm-rad-backend/domain/connection"
-	"cpm-rad-backend/domain/user_profile"
 )
 
 type Employee struct {
@@ -65,12 +64,12 @@ func (req *EmployeeRequest) ToModel() *Employee {
 	}
 }
 
-func (employee *Employee) Parse(u *user_profile.UserProfile) {
-	employee.EmployeeID = u.EmpID
-	employee.FirstName = u.FirstName
-	employee.LastName = u.LastName
-	employee.Title = u.Title
-	employee.Position = u.Position
-	employee.BA = u.BusinessArea
-	employee.DeptChangeCode = u.DeptChangeCode
-}
+// func (employee *Employee) Parse(u *user_profile.UserProfile) {
+// 	employee.EmployeeID = u.EmpID
+// 	employee.FirstName = u.FirstName
+// 	employee.LastName = u.LastName
+// 	employee.Title = u.Title
+// 	employee.Position = u.Position
+// 	employee.BA = u.BusinessArea
+// 	employee.DeptChangeCode = u.DeptChangeCode
+// }
