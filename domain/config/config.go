@@ -9,12 +9,29 @@ import (
 var AppURL string
 var AppPort string
 var DBCpm string
+var AuthCallbackURL string
+var AuthClientID string
+var AuthClientSecret string
+var AuthJWTEnabled bool
+var AuthJWTKey string
+var AuthJWTSecret string
+var AuthState string
+var AuthURL string
 
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
 	// set default variable
 	viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
+
+	viper.SetDefault("auth.callback.url", "http://localhost:3000")
+	viper.SetDefault("auth.client.id", "client_id")
+	viper.SetDefault("auth.client.secret", "client_secret")
+	viper.SetDefault("auth.jwt.enabled", true)
+	viper.SetDefault("auth.jwt.key", "cmdc-token")
+	viper.SetDefault("auth.jwt.secret", "super-secret")
+	viper.SetDefault("auth.state", "state")
+	viper.SetDefault("auth.url", "https://sso.pea.co.th/auth/realms/idm")
 
 	// set config file
 	viper.SetConfigName("config")
