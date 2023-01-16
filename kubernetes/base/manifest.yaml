@@ -18,7 +18,7 @@ spec:
         - name: primary
           image: ${image}
           ports:
-            - containerPort: 8000
+            - containerPort: 80
               protocol: TCP
           envFrom:
             - secretRef:
@@ -41,7 +41,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8000
+      targetPort: 80
   type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
