@@ -18,7 +18,7 @@ spec:
         - name: primary
           image: ${image}
           ports:
-            - containerPort: 80
+            - containerPort: 8000
               protocol: TCP
           envFrom:
             - secretRef:
