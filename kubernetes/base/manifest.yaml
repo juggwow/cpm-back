@@ -40,8 +40,8 @@ spec:
     app: ${app_name}
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 8000
+      targetPort: 8000
   type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
@@ -59,6 +59,6 @@ spec:
               service:
                 name: ${app_name}
                 port:
-                  number: 80
+                  number: 8000
             path: /
             pathType: Prefix
