@@ -5,6 +5,7 @@ import (
 	"cpm-rad-backend/domain/config"
 	"cpm-rad-backend/domain/connection"
 	"cpm-rad-backend/domain/contract"
+	"cpm-rad-backend/domain/contract_boq_search"
 	"cpm-rad-backend/domain/health_check"
 	"cpm-rad-backend/domain/logger"
 	"net/http"
@@ -117,5 +118,6 @@ func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
 
 	//fmt.Print(db)
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
+	api.GET("/contract/:id/boq", contract_boq_search.GetHandler(contract_boq_search.Get(db)))
 
 }
