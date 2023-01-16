@@ -11,8 +11,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"go.uber.org/zap"
-	"gorm.io/driver/sqlserver"
-	"gorm.io/gorm"
 )
 
 func main() {
@@ -26,14 +24,16 @@ func main() {
 	defer zaplog.Sync()
 
 	// Database
-	cpmDB, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("can't connect DB : %v", err)
-	}
+	// cpmDB, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
+	// if err != nil {
+	// 	log.Fatalf("can't connect DB : %v", err)
+	// }
 
-	db := &connection.DBConnection{
-		CPM: cpmDB,
-	}
+	// db := &connection.DBConnection{
+	// 	CPM: cpmDB,
+	// }
+
+	db := &connection.DBConnection{}
 
 	// Migrate the schema
 	// db.AutoMigrate(&Product{})
@@ -43,7 +43,7 @@ func main() {
 	// Routes
 	InitAPIV1(e.Group("/api/v1"), db)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":8000"))
 
 }
 
