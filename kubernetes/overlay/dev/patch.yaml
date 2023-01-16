@@ -35,7 +35,7 @@ spec:
         paths:
           - backend:
               service:
-                name: ${app_name}-service
+                name: ${app_name}
                 port:
                   number: 80
             path: /
