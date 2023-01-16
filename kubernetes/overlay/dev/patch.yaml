@@ -37,6 +37,6 @@ spec:
               service:
                 name: ${app_name}
                 port:
-                  number: 8000
+                  number: 80
             path: /
             pathType: Prefix

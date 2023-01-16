@@ -43,7 +43,7 @@ func main() {
 	// Routes
 	InitAPIV1(e.Group("/api/v1"), db)
 
-	e.Logger.Fatal(e.Start(":8000"))
+	e.Logger.Fatal(e.Start(":80"))
 
 }
 

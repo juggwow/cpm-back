@@ -16,7 +16,7 @@ COPY --from=builder /goapi /goapi
 
 USER nonroot:nonroot
 
-EXPOSE 8000
+EXPOSE 80
 
 CMD [ "/goapi" ]
 
