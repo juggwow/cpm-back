@@ -18,14 +18,14 @@ func InitConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+	// แปลง _ underscore ใน env เป็น . dot notation ใน viper
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	err := viper.ReadInConfig()
 	if err != nil {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
-
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.AutomaticEnv()
 
 	DBCpm = viper.GetString("db.cpm")
 
