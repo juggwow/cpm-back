@@ -2,16 +2,17 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 var DBCpm string
 
 func InitConfig() {
 	// set default variable
-	//viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
-	viper.SetDefault("db.cpm", "sqlserver://cpm_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@172.30.212.55:50574?database=CPM")
+	viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
 
 	// set config file
 	viper.SetConfigName("config")
@@ -19,11 +20,11 @@ func InitConfig() {
 	viper.AddConfigPath(".")
 
 	err := viper.ReadInConfig()
-
 	if err != nil {
-		fmt.Printf("Fatal error config file : %s \n", err)
+		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
 
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
 	DBCpm = viper.GetString("db.cpm")
