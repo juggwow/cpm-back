@@ -12,7 +12,7 @@ var DBCpm string
 
 func InitConfig() {
 	// set default variable
-	viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
+	// viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
 
 	// set config file
 	viper.SetConfigName("config")
@@ -22,6 +22,7 @@ func InitConfig() {
 	// viper.AllowEmptyEnv(true)
 	// แปลง _ underscore ใน env เป็น . dot notation ใน viper
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	// viper.SetEnvKeyReplacer(strings.NewReplacer("_", "."))
 
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -29,5 +30,6 @@ func InitConfig() {
 	}
 
 	DBCpm = viper.GetString("db.cpm")
+	// DBCpm = viper.Get("db.cpm")
 
 }
