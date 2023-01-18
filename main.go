@@ -76,7 +76,7 @@ func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
 			// log.Fatalf("can't connect DB : %v", err)
 			return c.String(http.StatusOK, fmt.Sprintf("can't connect DB : %v", err))
 		}
-		return c.String(http.StatusOK, "Hello, DB!!")
+		return c.String(http.StatusOK, fmt.Sprintf("Hello, DB!! : %v", config.DBCpm))
 	})
 
 }
