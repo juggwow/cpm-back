@@ -30,6 +30,6 @@ func InitConfig() {
 	}
 
 	// DBCpm = viper.GetString("db.cpm")
-	DBCpm = fmt.Sprintf("%v", viper.AllKeys())
+	DBCpm = fmt.Sprintf("%#v", viper.AllKeys())
 
 }
