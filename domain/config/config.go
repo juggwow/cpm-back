@@ -19,7 +19,7 @@ func InitConfig() {
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
-	// viper.AllowEmptyEnv(true)
+	viper.AllowEmptyEnv(true)
 	// แปลง _ underscore ใน env เป็น . dot notation ใน viper
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	// viper.SetEnvKeyReplacer(strings.NewReplacer("_", "."))
@@ -29,7 +29,7 @@ func InitConfig() {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
 
-	// DBCpm = viper.GetString("db.cpm")
-	DBCpm = fmt.Sprintf("%#v", viper.AllKeys())
+	DBCpm = viper.GetString("db.cpm")
+	// DBCpm = fmt.Sprintf("%#v", viper.AllKeys())
 
 }
