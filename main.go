@@ -11,6 +11,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"go.uber.org/zap"
+	"gorm.io/driver/sqlserver"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -67,4 +69,14 @@ func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
 	api.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!!")
 	})
+
+	api.GET("/db", func(c echo.Context) error {
+		_, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
+		if err != nil {
+			// log.Fatalf("can't connect DB : %v", err)
+			return c.String(http.StatusOK, fmt.Sprintf("can't connect DB : %v", err))
+		}
+		return c.String(http.StatusOK, "Hello, DB!!")
+	})
+
 }

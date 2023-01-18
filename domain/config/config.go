@@ -10,7 +10,8 @@ var DBCpm string
 
 func InitConfig() {
 	// set default variable
-	viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
+	//viper.SetDefault("db.cpm", "sqlserver://sa:yourStrongPassword@localhost:1433?database=dbname")
+	viper.SetDefault("db.cpm", "sqlserver://cpm_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@172.30.212.55:50574?database=CPM")
 
 	// set config file
 	viper.SetConfigName("config")
