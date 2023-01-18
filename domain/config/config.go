@@ -29,7 +29,7 @@ func InitConfig() {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
 
-	DBCpm = viper.GetString("db.cpm")
-	// DBCpm = viper.Get("db.cpm")
+	// DBCpm = viper.GetString("db.cpm")
+	DBCpm = fmt.Sprintf("%v", viper.AllKeys())
 
 }
