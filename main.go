@@ -74,7 +74,7 @@ func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
 		_, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
 		if err != nil {
 			// log.Fatalf("can't connect DB : %v", err)
-			return c.String(http.StatusOK, fmt.Sprintf("can't connect DB : %v", err))
+			return c.String(http.StatusOK, fmt.Sprintf("can't connect DB : %v : %v", err, config.DBCpm))
 		}
 		return c.String(http.StatusOK, fmt.Sprintf("Hello, DB!! : %v", config.DBCpm))
 	})
