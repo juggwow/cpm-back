@@ -18,15 +18,6 @@ func (fn getFunc) Get(ctx context.Context, spec BoQSearchSpec, ID uint) (contrac
 	return fn(ctx, spec, ID)
 }
 
-// GetHandler godoc
-// @Summary get boq items
-// @Tags BOQ
-// @Accept json
-// @Produce json
-// @Param _ query BoQSearchSpec false "BoQ items Search Query"
-// @Success 200 {object} response.ResponseData[contract_boq.BoQResponse]
-// @Router api/v1/contract/:id/boq [get]
-// @Security ApiKeyAuth
 func GetHandler(svc getFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log := logger.Unwrap(c)
