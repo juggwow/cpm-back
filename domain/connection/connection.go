@@ -7,7 +7,7 @@ import (
 )
 
 type DBConnection struct {
-	CPM *gorm.DB
+	RAD *gorm.DB
 }
 
 type BaseModel struct {

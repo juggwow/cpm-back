@@ -14,7 +14,11 @@ type Contract struct {
 	ContractID uint   `gorm:"column:WORK_CONTRACT_ID"`
 	WorkID     uint   `gorm:"column:WORK_ID"`
 	WorkName   string `gorm:"column:WORK_NAME"`
-	WorkType   string `gorm:"column:WORK_TYPE_DESCRIPTION"`
+	WorkType   string `gorm:"column:WORK_TYPE"`
+}
+
+func (Contract) TableName() string {
+	return "CPM.VIEW_RAD_WORK_NAME"
 }
 
 func (contract *Contract) ToResponse() ContractResponse {
