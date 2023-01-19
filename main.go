@@ -46,7 +46,7 @@ func main() {
 	}
 
 	db := &connection.DBConnection{
-		CPM: cpmDB,
+		RAD: cpmDB,
 	}
 
 	// db := &connection.DBConnection{}
