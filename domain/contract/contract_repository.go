@@ -13,9 +13,9 @@ func GetByID(db *connection.DBConnection) getByIDFunc {
 		// cpm = cpm.Preload("EmployeeJobs.Employee")
 		// cpm = cpm.Preload("EmployeeJobs.EmployeeRole")
 		//db.Table("users").Select("users.name, emails.email").Joins("left join emails on emails.user_id = users.id").Scan(&results)
-		err := cpm.Table("CPM.CPM_WORK_CONTRACT as cwc").
+		err := cpm.Table("[WDDEVDB\\WORKD].[CPM].[CPM].[CPM_WORK_CONTRACT] as cwc").
 			Select("cwc.ID as WORK_CONTRACT_ID , cwc.WORK_ID ,vawdd.WORK_NAME ,vawdd.WORK_TYPE_DESCRIPTION").
-			Joins("LEFT OUTER JOIN CPM.VIEW_ASSIGN_WORK_DESIGN_DETAIL as vawdd ON cwc.WORK_ID = vawdd.WORK_ID").
+			Joins("LEFT OUTER JOIN [WDDEVDB\\WORKD].[CPM].[CPM].[VIEW_ASSIGN_WORK_DESIGN_DETAIL] as vawdd ON cwc.WORK_ID = vawdd.WORK_ID").
 			Where("cwc.ID = ?", ID).
 			Scan(&result).
 			Error

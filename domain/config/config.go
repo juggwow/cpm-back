@@ -24,7 +24,7 @@ func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
 	// set default variable
-	viper.SetDefault("db.cpm", "sqlserver://cpm_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@172.30.212.55:50574?database=CPM")
+	viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
 
 	viper.SetDefault("auth.callback.url", "http://localhost:3000")
 	viper.SetDefault("auth.client.id", "client_id")
@@ -51,7 +51,7 @@ func InitConfig() {
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
-	DBCpm = viper.GetString("db.cpm")
+	DBCpm = viper.GetString("db.rad")
 	// DBCpm = fmt.Sprintf("%#v", viper.AllKeys())
 
 }
