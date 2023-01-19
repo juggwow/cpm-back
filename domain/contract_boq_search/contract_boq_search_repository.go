@@ -10,7 +10,7 @@ import (
 
 func Get(db *connection.DBConnection) getFunc {
 	return func(ctx context.Context, spec BoQSearchSpec, id uint) (contract_boq.BoQItems, int64, error) {
-		jobs, count, err := spec.searchBoQItems(db.RAD, &id)
+		jobs, count, err := spec.searchBoQItems(db.CPM, &id)
 		if err != nil {
 			return jobs, count, err
 		}

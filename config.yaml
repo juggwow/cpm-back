@@ -1,1 +1,0 @@
-db.rad: "sqlserver://sa:YourStrong@Passw0rd@localhost:1433?database=CPM"
