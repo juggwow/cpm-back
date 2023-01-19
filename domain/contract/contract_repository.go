@@ -7,13 +7,16 @@ import (
 
 func GetByID(db *connection.DBConnection) getByIDFunc {
 	return func(ctx context.Context, ID int) (Contract, error) {
-		var result Contract
-		rad := db.RAD.Model(&result)
+		result := Contract{}
+		cpm := db.CPM
 		//fmt.Printf("Fatal id : %d \n", ID)
 		// cpm = cpm.Preload("EmployeeJobs.Employee")
 		// cpm = cpm.Preload("EmployeeJobs.EmployeeRole")
 		//db.Table("users").Select("users.name, emails.email").Joins("left join emails on emails.user_id = users.id").Scan(&results)
-		err := rad.Where("WORK_CONTRACT_ID = ?", ID).
+		err := cpm.Table("[WDDEVDB\\WORKD].[CPM].[CPM].[CPM_WORK_CONTRACT] as cwc").
+			Select("cwc.ID as WORK_CONTRACT_ID , cwc.WORK_ID ,vawdd.WORK_NAME ,vawdd.WORK_TYPE_DESCRIPTION").
+			Joins("LEFT OUTER JOIN [WDDEVDB\\WORKD].[CPM].[CPM].[VIEW_ASSIGN_WORK_DESIGN_DETAIL] as vawdd ON cwc.WORK_ID = vawdd.WORK_ID").
+			Where("cwc.ID = ?", ID).
 			Scan(&result).
 			Error
 		if err != nil {
