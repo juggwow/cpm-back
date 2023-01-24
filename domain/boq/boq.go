@@ -2,17 +2,6 @@ package boq
 
 import "cpm-rad-backend/domain/request"
 
-// type BoQRequest struct {
-// 	SequencesNo           uint   `json:"sequencesNo"`
-// 	BoQItemNo             string `json:"itemNo"`
-// 	BoQItemName           string `json:"name"`
-// 	BoQItemGroup          string `json:"group"`
-// 	BoQItemQuantity       string `json:"quantity"`
-// 	BoQItemAmountDelivery string `json:"delivery"`
-// 	BoQItemAmountGood     string `json:"good"`
-// 	BoQItemAmountBad      string `json:"bad"`
-// }
-
 type Response struct {
 	SequencesNo        uint   `json:"sequencesNo"`
 	ID                 uint   `json:"boqID"`
@@ -23,6 +12,11 @@ type Response struct {
 	ItemAmountDelivery string `json:"delivery"`
 	ItemAmountGood     string `json:"good"`
 	ItemAmountBad      string `json:"bad"`
+}
+
+type ItemResponse struct {
+	ID       uint   `json:"boqID",gorm:"column:ID"`
+	ItemName string `json:"name",gorm:"column:NAME"`
 }
 
 type Item struct {
@@ -60,21 +54,6 @@ func (Item) TableName() string {
 	return "CPM.VIEW_RAD_BOQ_ITEMS"
 }
 
-// func (req *BoQRequest) ToModel() BoQItem {
-
-// 	boqItem := BoQItem{
-// 		SequencesNo:     req.SequencesNo,
-// 		BoQID:           0,
-// 		BoQItemNo:       req.BoQItemNo,
-// 		BoQItemName:     req.BoQItemName,
-// 		BoQItemGroup:    req.BoQItemGroup,
-// 		BoQItemQuantity: 0,
-// 		BoQItemUnit:     "",
-// 	}
-
-// 	return boqItem
-// }
-
 func (item *Item) ToResponse() Response {
 	res := Response{
 		SequencesNo:        item.SequencesNo,
@@ -92,9 +71,9 @@ func (item *Item) ToResponse() Response {
 }
 
 func (items *Items) ToResponse() []Response {
-	responses := make([]Response, len(*items))
+	res := make([]Response, len(*items))
 	for i, item := range *items {
-		responses[i] = item.ToResponse()
+		res[i] = item.ToResponse()
 	}
-	return responses
+	return res
 }

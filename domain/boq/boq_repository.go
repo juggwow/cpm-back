@@ -54,3 +54,17 @@ func (spec *ItemSearchSpec) buildSearchCriteria(db *gorm.DB, id *uint) (*gorm.DB
 
 	return db, db.Error
 }
+
+func GetItemByID(db *connection.DBConnection) getItemByIDFunc {
+	return func(ctx context.Context, id uint) (ItemResponse, error) {
+		var result ItemResponse
+		cpm := db.CPM.Model(&result)
+		err := cpm.Where("ID = ?", id).Scan(&result).Error
+
+		if err != nil {
+			return result, err
+		}
+
+		return result, err
+	}
+}
