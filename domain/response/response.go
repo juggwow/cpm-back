@@ -1,14 +1,14 @@
 package response
 
-type ResponseID struct {
+type ID struct {
 	ID uint `json:"id"`
 }
 
-type ResponseError struct {
+type Error struct {
 	Error string `json:"error"`
 }
 
-type ResponseData[T any] struct {
+type Data[T any] struct {
 	Data  []T   `json:"data"`
 	Page  int   `json:"page"`
 	Limit int   `json:"limit"`

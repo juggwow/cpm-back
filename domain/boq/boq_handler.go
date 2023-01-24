@@ -26,12 +26,12 @@ func GetHandler(svc getFunc) echo.HandlerFunc {
 		boqItems, total, err := svc.Get(c.Request().Context(), spec, uint(ID))
 		if err != nil {
 			log.Error(err.Error())
-			return c.JSON(http.StatusNotFound, response.ResponseError{Error: err.Error()})
+			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
 		}
 
 		data := boqItems.ToResponse()
 
-		return c.JSON(http.StatusOK, response.ResponseData[Response]{
+		return c.JSON(http.StatusOK, response.Data[Response]{
 			Data:  data,
 			Page:  spec.GetPage(),
 			Limit: spec.GetLimit(),
@@ -69,5 +69,30 @@ func ParseSearchSpec(c echo.Context) ItemSearchSpec {
 		SortItemDelivery: "",
 		SortItemReceive:  "",
 		SortItemDamage:   "",
+	}
+}
+
+type getItemByIDFunc func(context.Context, uint) (ItemResponse, error)
+
+func (fn getItemByIDFunc) GetItemByID(ctx context.Context, ID uint) (ItemResponse, error) {
+	return fn(ctx, ID)
+}
+
+func GetItemByIDHandler(svc getItemByIDFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+
+		ID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusNotFound, response.Error{Error: logger.INVALID})
+		}
+		item, err := svc.GetItemByID(c.Request().Context(), uint(ID))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusNotFound, response.Error{Error: logger.NOT_FOUND})
+		}
+
+		return c.JSON(http.StatusOK, item)
 	}
 }

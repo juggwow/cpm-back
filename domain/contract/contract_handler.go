@@ -25,14 +25,14 @@ func GetByIDHandler(svc getByIDFunc) echo.HandlerFunc {
 		ID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			log.Error(err.Error())
-			return c.JSON(http.StatusBadRequest, response.ResponseError{Error: err.Error()})
+			return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
 		}
 
 		contract, err := svc.GetByID(c.Request().Context(), ID)
 		zap.L().Sugar().Infof("work contract %d", ID)
 		if err != nil {
 			log.Error(err.Error())
-			return c.JSON(http.StatusNotFound, response.ResponseError{Error: err.Error()})
+			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
 		}
 		data := contract.ToResponse()
 		return c.JSON(http.StatusOK, data)
