@@ -15,8 +15,8 @@ type Response struct {
 }
 
 type ItemResponse struct {
-	ID       uint   `json:"boqID",gorm:"column:ID"`
-	ItemName string `json:"name",gorm:"column:NAME"`
+	ID       uint   `json:"boqID" gorm:"column:ID"`
+	ItemName string `json:"name" gorm:"column:NAME"`
 }
 
 type Item struct {
