@@ -49,3 +49,17 @@ func Create(db *connection.DBConnection) createFunc {
 		return formID, err
 	}
 }
+
+func GetCountry(db *connection.DBConnection) getCountryFunc {
+	return func(ctx context.Context) (Countrys, error) {
+		var result Countrys
+		cpm := db.CPM.Model(&result)
+		err := cpm.Table(`WDDEVDB\WORKD.CPM.CPM.COUNTRY`).
+			Select("ID,CODE,NAME").Scan(&result).Error
+		if err != nil {
+			return result, err
+		}
+
+		return result, err
+	}
+}

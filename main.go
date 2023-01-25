@@ -129,6 +129,7 @@ func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
 	api.GET("/contract/:id/boq", boq.GetHandler(boq.Get(db)))
 
 	api.GET("/boq/:id", boq.GetItemByIDHandler(boq.GetItemByID(db)))
+	api.GET("/country", form.GetCountryHandler(form.GetCountry(db)))
 	api.POST("/form", form.CreateHandler(form.Create(db)))
 
 }

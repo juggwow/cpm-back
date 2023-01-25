@@ -48,3 +48,22 @@ func invalidRequest(req *Request) bool {
 
 	return req.ItemID == 0
 }
+
+type getCountryFunc func(context.Context) (Countrys, error)
+
+func (fn getCountryFunc) GetCountry(ctx context.Context) (Countrys, error) {
+	return fn(ctx)
+}
+
+func GetCountryHandler(svc getCountryFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+
+		countrys, err := svc.GetCountry(c.Request().Context())
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
+		}
+		return c.JSON(http.StatusOK, countrys)
+	}
+}
