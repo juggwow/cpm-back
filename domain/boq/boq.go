@@ -15,8 +15,10 @@ type Response struct {
 }
 
 type ItemResponse struct {
-	ID       uint   `json:"boqID" gorm:"column:ID"`
-	ItemName string `json:"name" gorm:"column:NAME"`
+	ID           uint   `json:"boqID" gorm:"column:ID"`
+	ItemName     string `json:"name" gorm:"column:NAME"`
+	ItemQuantity string `json:"quantity" gorm:"column:QUANTITY"`
+	ItemUnit     string `json:"unit" gorm:"column:UNIT"`
 }
 
 type Item struct {
