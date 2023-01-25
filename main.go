@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"cpm-rad-backend/domain/boq"
 	"cpm-rad-backend/domain/config"
 	"cpm-rad-backend/domain/connection"
 	"cpm-rad-backend/domain/contract"
-	"cpm-rad-backend/domain/contract_boq_search"
+	"cpm-rad-backend/domain/form"
 	"cpm-rad-backend/domain/health_check"
 	"cpm-rad-backend/domain/logger"
 	"fmt"
@@ -125,6 +126,10 @@ func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
 
 	//fmt.Print(db)
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
-	api.GET("/contract/:id/boq", contract_boq_search.GetHandler(contract_boq_search.Get(db)))
+	api.GET("/contract/:id/boq", boq.GetHandler(boq.Get(db)))
+
+	api.GET("/boq/:id", boq.GetItemByIDHandler(boq.GetItemByID(db)))
+	api.GET("/country", form.GetCountryHandler(form.GetCountry(db)))
+	api.POST("/form", form.CreateHandler(form.Create(db)))
 
 }
