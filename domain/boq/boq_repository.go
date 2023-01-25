@@ -49,7 +49,7 @@ func (spec *ItemSearchSpec) searchBoQItems(db *gorm.DB, id *uint) (Items, int64,
 
 func (spec *ItemSearchSpec) buildSearchCriteria(db *gorm.DB, id *uint) (*gorm.DB, error) {
 
-	db = db.Select("ROW_NUMBER() OVER(ORDER BY ID ASC) AS SEQUENCES_NO,ID,ITEM,NAME,GROUPNAME,CONCAT(QUANTITY,' ',UNIT)  AS QUANTITY").
+	db = db.Select("ROW_NUMBER() OVER(ORDER BY ID ASC) AS SEQUENCES_NO,ID,ITEM,NAME,GROUPNAME,QUANTITY,UNIT").
 		Where("WORK_CONTRACT_ID = ?", id).Order("ID ASC")
 
 	return db, db.Error

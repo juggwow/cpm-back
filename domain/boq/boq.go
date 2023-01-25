@@ -1,6 +1,11 @@
 package boq
 
-import "cpm-rad-backend/domain/request"
+import (
+	"cpm-rad-backend/domain/request"
+	"fmt"
+
+	"github.com/shopspring/decimal"
+)
 
 type Response struct {
 	SequencesNo        uint   `json:"sequencesNo"`
@@ -15,19 +20,20 @@ type Response struct {
 }
 
 type ItemResponse struct {
-	ID           uint   `json:"boqID" gorm:"column:ID"`
-	ItemName     string `json:"name" gorm:"column:NAME"`
-	ItemQuantity string `json:"quantity" gorm:"column:QUANTITY"`
-	ItemUnit     string `json:"unit" gorm:"column:UNIT"`
+	ID           uint            `json:"boqID" gorm:"column:ID"`
+	ItemName     string          `json:"name" gorm:"column:NAME"`
+	ItemQuantity decimal.Decimal `json:"quantity" gorm:"column:QUANTITY"`
+	ItemUnit     string          `json:"unit" gorm:"column:UNIT"`
 }
 
 type Item struct {
-	SequencesNo  uint   `gorm:"column:SEQUENCES_NO"`
-	ID           uint   `gorm:"column:ID"`
-	ItemNo       string `gorm:"column:ITEM"`
-	ItemName     string `gorm:"column:NAME"`
-	ItemGroup    string `gorm:"column:GROUPNAME"`
-	ItemQuantity string `gorm:"column:QUANTITY"`
+	SequencesNo  uint            `gorm:"column:SEQUENCES_NO"`
+	ID           uint            `gorm:"column:ID"`
+	ItemNo       string          `gorm:"column:ITEM"`
+	ItemName     string          `gorm:"column:NAME"`
+	ItemGroup    string          `gorm:"column:GROUPNAME"`
+	ItemQuantity decimal.Decimal `gorm:"column:QUANTITY"`
+	ItemUnit     string          `gorm:"column:UNIT"`
 }
 
 type Items []Item
@@ -56,6 +62,10 @@ func (Item) TableName() string {
 	return "CPM.VIEW_RAD_BOQ_ITEMS"
 }
 
+func (ItemResponse) TableName() string {
+	return "CPM.VIEW_RAD_BOQ_ITEMS"
+}
+
 func (item *Item) ToResponse() Response {
 	res := Response{
 		SequencesNo:        item.SequencesNo,
@@ -63,7 +73,7 @@ func (item *Item) ToResponse() Response {
 		ItemNo:             item.ItemNo,
 		ItemName:           item.ItemName,
 		ItemGroup:          item.ItemGroup,
-		ItemQuantity:       item.ItemQuantity,
+		ItemQuantity:       fmt.Sprintf("%v %v", item.ItemQuantity, item.ItemUnit),
 		ItemAmountDelivery: "",
 		ItemAmountGood:     "",
 		ItemAmountBad:      "",
