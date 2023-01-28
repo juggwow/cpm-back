@@ -20,6 +20,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/zap"
 	"gorm.io/driver/sqlserver"
@@ -58,9 +60,18 @@ func main() {
 	// 	return
 	// }
 
-	initPublicAPI(e, db)
+	minioClient, err := minio.New(config.StorageEndpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(config.StorageAccessKey, config.StorageSecretKey, ""),
+		Secure: config.StorageSSL,
+	})
+	if err != nil {
+		log.Fatalf("can't connect MINIO client: %v", err)
+		panic(err)
+	}
 
-	InitAPIV1(e.Group("/api/v1"), db)
+	initPublicAPI(e, db, minioClient)
+
+	initAPIV1(e.Group("/api/v1"), db, minioClient)
 
 	go func() {
 		if err := e.Start(":" + config.AppPort); err != nil {
@@ -100,7 +111,7 @@ func getRoute(zaplog *zap.Logger) *echo.Echo {
 	return e
 }
 
-func initPublicAPI(e *echo.Echo, db *connection.DBConnection) {
+func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient *minio.Client) {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!!")
 	})
@@ -122,7 +133,7 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection) {
 	// }
 }
 
-func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
+func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient *minio.Client) {
 
 	//fmt.Print(db)
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
