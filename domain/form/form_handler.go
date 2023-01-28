@@ -5,7 +5,9 @@ import (
 	"cpm-rad-backend/domain/logger"
 	"cpm-rad-backend/domain/response"
 	"fmt"
+	"mime/multipart"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -65,5 +67,46 @@ func GetCountryHandler(svc getCountryFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
 		}
 		return c.JSON(http.StatusOK, countrys)
+	}
+}
+
+type fileUploadFunc func(context.Context, *multipart.FileHeader, int) (FileUploadResponse, error)
+
+func (fn fileUploadFunc) FileUpload(ctx context.Context, file *multipart.FileHeader, itemID int) (FileUploadResponse, error) {
+	return fn(ctx, file, itemID)
+}
+
+func FileUploadHandler(svc fileUploadFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var fus FileUploadResponses
+		log := logger.Unwrap(c)
+
+		itemID, err := strconv.Atoi(c.Param("itemid"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.String(http.StatusBadRequest, fmt.Sprintf("file err : %s", err.Error()))
+		}
+		fieldName := c.Param("fieldName")
+
+		// file, err := c.FormFile(fieldName)
+
+		form, _ := c.MultipartForm()
+		files := form.File[fieldName]
+		// filePaths := []string{}
+		for _, file := range files {
+			src, err := file.Open()
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+			}
+			defer src.Close()
+			res, err := svc.FileUpload(c.Request().Context(), file, itemID)
+			fus = append(fus, res)
+			if err != nil {
+				log.Error(err.Error())
+				return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+			}
+		}
+
+		return c.JSON(http.StatusOK, fus)
 	}
 }

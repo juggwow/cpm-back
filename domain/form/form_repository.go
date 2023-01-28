@@ -3,7 +3,10 @@ package form
 import (
 	"context"
 	"cpm-rad-backend/domain/connection"
+	"cpm-rad-backend/domain/minio"
 	"fmt"
+	"mime/multipart"
+	"path/filepath"
 
 	"gorm.io/gorm"
 )
@@ -60,6 +63,20 @@ func GetCountry(db *connection.DBConnection) getCountryFunc {
 			return result, err
 		}
 
+		return result, err
+	}
+}
+
+func FileUpload(db *connection.DBConnection, m minio.Client) fileUploadFunc {
+	return func(ctx context.Context, file *multipart.FileHeader, itemID int) (FileUploadResponse, error) {
+		// var result FileUploadResponse
+		info, err := m.Upload(ctx, file)
+		result := FileUploadResponse{
+			Name:     info.Key,
+			Size:     info.Size,
+			Unit:     "",
+			FileType: filepath.Ext(info.Key),
+		}
 		return result, err
 	}
 }

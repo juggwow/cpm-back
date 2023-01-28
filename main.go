@@ -9,6 +9,7 @@ import (
 	"cpm-rad-backend/domain/form"
 	"cpm-rad-backend/domain/health_check"
 	"cpm-rad-backend/domain/logger"
+	"cpm-rad-backend/domain/minio"
 	"fmt"
 	"net/http"
 	"os"
@@ -20,8 +21,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/zap"
 	"gorm.io/driver/sqlserver"
@@ -60,14 +59,7 @@ func main() {
 	// 	return
 	// }
 
-	minioClient, err := minio.New(config.StorageEndpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(config.StorageAccessKey, config.StorageSecretKey, ""),
-		Secure: config.StorageSSL,
-	})
-	if err != nil {
-		log.Fatalf("can't connect MINIO client: %v", err)
-		panic(err)
-	}
+	minioClient := initMinio()
 
 	initPublicAPI(e, db, minioClient)
 
@@ -86,6 +78,23 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 
+}
+
+func initMinio() minio.Client {
+	conf := minio.Configuration{
+		Endpoint:   config.StorageEndpoint,
+		AccessKey:  config.StorageAccessKey,
+		SecretKey:  config.StorageSecretKey,
+		UseSSL:     config.StorageSSL,
+		BucketName: config.StorageBucketName,
+	}
+	if err := minio.NewConnection(conf); err != nil {
+		log.Fatalf("can't connect MINIO client: %v", err)
+		panic(err)
+	}
+
+	minioClient := minio.GetClient()
+	return minioClient
 }
 
 func getRoute(zaplog *zap.Logger) *echo.Echo {
@@ -111,7 +120,7 @@ func getRoute(zaplog *zap.Logger) *echo.Echo {
 	return e
 }
 
-func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient *minio.Client) {
+func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.Client) {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!!")
 	})
@@ -122,7 +131,7 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient *minio
 	e.GET("/healths", health_check.HealthCheck)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	// e.GET("/uploads/:filename", upload.DownloadHandler(minioClient))
+	e.POST("/uploads/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
 
 	// if authenticator, err := auth.NewAuthenticator(); err == nil {
 	// 	e.GET("/auth", authenticator.AuthenHandler())
@@ -133,7 +142,7 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient *minio
 	// }
 }
 
-func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient *minio.Client) {
+func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.Client) {
 
 	//fmt.Print(db)
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
