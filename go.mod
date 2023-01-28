@@ -2,7 +2,10 @@ module cpm-rad-backend
 
 go 1.18
 
-require github.com/coreos/go-oidc/v3 v3.5.0
+require (
+	github.com/coreos/go-oidc/v3 v3.5.0
+	github.com/shopspring/decimal v1.3.1
+)
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -23,7 +26,6 @@ require (
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a // indirect
 	github.com/swaggo/swag v1.8.1 // indirect
