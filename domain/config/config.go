@@ -19,6 +19,11 @@ var AuthJWTKey string
 var AuthJWTSecret string
 var AuthState string
 var AuthURL string
+var StorageSSL bool
+var StorageEndpoint string
+var StorageAccessKey string
+var StorageSecretKey string
+var StorageBucketName string
 
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
@@ -34,6 +39,12 @@ func InitConfig() {
 	viper.SetDefault("auth.jwt.secret", "super-secret")
 	viper.SetDefault("auth.state", "state")
 	viper.SetDefault("auth.url", "https://sso.pea.co.th/auth/realms/idm")
+
+	viper.SetDefault("storage.ssl", true)
+	viper.SetDefault("storage.endpoint", "minio-api-kolpos.pea.co.th")
+	viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
+	viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
+	viper.SetDefault("storage.bucketName", "devpool-rad")
 
 	// set config file
 	viper.SetConfigName("config")
@@ -52,6 +63,11 @@ func InitConfig() {
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
 	DBCpm = viper.GetString("db.rad")
+	StorageSSL = viper.GetBool("storage.ssl")
+	StorageEndpoint = viper.GetString("storage.endpoint")
+	StorageAccessKey = viper.GetString("storage.accessKey")
+	StorageSecretKey = viper.GetString("storage.secretKey")
+	StorageBucketName = viper.GetString("storage.bucketName")
 	// DBCpm = fmt.Sprintf("%#v", viper.AllKeys())
 
 }

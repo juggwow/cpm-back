@@ -93,3 +93,15 @@ func (c *RadTime) UnmarshalJSON(b []byte) error {
 func (c RadTime) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + time.Time(c).Format("2006-01-02") + `"`), nil
 }
+
+type FileUploadResponse struct {
+	Name        string `json:"name"`
+	ObjectName  string `json:"objectName"`
+	DisplaySize string `json:"displaySize"`
+	Size        string `json:"size"`
+	Unit        string `json:"unit"`
+	FileType    string `json:"fileType"`
+	FilePath    string `json:"filePath"`
+}
+
+type FileUploadResponses []FileUploadResponse

@@ -9,6 +9,7 @@ import (
 	"cpm-rad-backend/domain/form"
 	"cpm-rad-backend/domain/health_check"
 	"cpm-rad-backend/domain/logger"
+	"cpm-rad-backend/domain/minio"
 	"fmt"
 	"net/http"
 	"os"
@@ -58,9 +59,11 @@ func main() {
 	// 	return
 	// }
 
-	initPublicAPI(e, db)
+	minioClient := initMinio()
 
-	InitAPIV1(e.Group("/api/v1"), db)
+	initPublicAPI(e, db, minioClient)
+
+	initAPIV1(e.Group("/api/v1"), db, minioClient)
 
 	go func() {
 		if err := e.Start(":" + config.AppPort); err != nil {
@@ -75,6 +78,23 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 
+}
+
+func initMinio() minio.Client {
+	conf := minio.Configuration{
+		Endpoint:   config.StorageEndpoint,
+		AccessKey:  config.StorageAccessKey,
+		SecretKey:  config.StorageSecretKey,
+		UseSSL:     config.StorageSSL,
+		BucketName: config.StorageBucketName,
+	}
+	if err := minio.NewConnection(conf); err != nil {
+		log.Fatalf("can't connect MINIO client: %v", err)
+		panic(err)
+	}
+
+	minioClient := minio.GetClient()
+	return minioClient
 }
 
 func getRoute(zaplog *zap.Logger) *echo.Echo {
@@ -100,7 +120,7 @@ func getRoute(zaplog *zap.Logger) *echo.Echo {
 	return e
 }
 
-func initPublicAPI(e *echo.Echo, db *connection.DBConnection) {
+func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.Client) {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!!")
 	})
@@ -111,7 +131,7 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection) {
 	e.GET("/healths", health_check.HealthCheck)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	// e.GET("/uploads/:filename", upload.DownloadHandler(minioClient))
+	e.POST("/uploads/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
 
 	// if authenticator, err := auth.NewAuthenticator(); err == nil {
 	// 	e.GET("/auth", authenticator.AuthenHandler())
@@ -122,7 +142,7 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection) {
 	// }
 }
 
-func InitAPIV1(api *echo.Group, db *connection.DBConnection) {
+func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.Client) {
 
 	//fmt.Print(db)
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
