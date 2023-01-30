@@ -42,10 +42,8 @@ func InitConfig() {
 
 	viper.SetDefault("storage.ssl", true)
 	viper.SetDefault("storage.endpoint", "minio-api-kolpos.pea.co.th")
-	// viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
-	// viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
-	viper.SetDefault("storage.accessKey", "devpool-rad")
-	viper.SetDefault("storage.secretKey", "YHWdKG6zePjiOGNEluK7oE3msPn50HCN")
+	viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
+	viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
 	viper.SetDefault("storage.bucketName", "devpool-rad")
 
 	// set config file

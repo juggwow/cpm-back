@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"mime/multipart"
 	"path/filepath"
+	"strings"
 
+	"github.com/inhies/go-bytesize"
 	"gorm.io/gorm"
 )
 
@@ -70,12 +72,20 @@ func GetCountry(db *connection.DBConnection) getCountryFunc {
 func FileUpload(db *connection.DBConnection, m minio.Client) fileUploadFunc {
 	return func(ctx context.Context, file *multipart.FileHeader, itemID int) (FileUploadResponse, error) {
 		// var result FileUploadResponse
-		info, err := m.Upload(ctx, file)
+		info, objectName, err := m.Upload(ctx, file, uint(itemID))
+
+		b := bytesize.New(float64(info.Size))
+		displaySize := b.Format("%.2f ", "", false)
+		words := strings.Fields(displaySize)
+
 		result := FileUploadResponse{
-			Name:     info.Key,
-			Size:     info.Size,
-			Unit:     "",
-			FileType: filepath.Ext(info.Key),
+			Name:        file.Filename,
+			ObjectName:  objectName,
+			DisplaySize: displaySize,
+			Size:        words[0],
+			Unit:        words[1],
+			FileType:    strings.Replace(filepath.Ext(info.Key), ".", "", 1),
+			FilePath:    info.Key,
 		}
 		return result, err
 	}

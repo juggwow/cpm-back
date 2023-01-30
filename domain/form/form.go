@@ -95,10 +95,13 @@ func (c RadTime) MarshalJSON() ([]byte, error) {
 }
 
 type FileUploadResponse struct {
-	Name     string `json:"name"`
-	Size     int64  `json:"size"`
-	Unit     string `json:"unit"`
-	FileType string `json:"fileType"`
+	Name        string `json:"name"`
+	ObjectName  string `json:"objectName"`
+	DisplaySize string `json:"displaySize"`
+	Size        string `json:"size"`
+	Unit        string `json:"unit"`
+	FileType    string `json:"fileType"`
+	FilePath    string `json:"filePath"`
 }
 
 type FileUploadResponses []FileUploadResponse

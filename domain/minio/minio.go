@@ -49,15 +49,15 @@ func GetClient() Client {
 }
 
 type Client interface {
-	Upload(ctx context.Context, file *multipart.FileHeader) (*minio.UploadInfo, error)
-	Delete(ctx context.Context, filename string) error
-	Download(ctx context.Context, filename string) (*minio.Object, string, error)
+	Upload(ctx context.Context, file *multipart.FileHeader, itemID uint) (*minio.UploadInfo, string, error)
+	Delete(ctx context.Context, filename string, itemID uint) error
+	Download(ctx context.Context, filename string, itemID uint) (*minio.Object, string, error)
 }
 
-func (m *client) Upload(ctx context.Context, file *multipart.FileHeader) (*minio.UploadInfo, error) {
+func (m *client) Upload(ctx context.Context, file *multipart.FileHeader, itemID uint) (*minio.UploadInfo, string, error) {
 	src, err := file.Open()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer src.Close()
 
@@ -65,18 +65,20 @@ func (m *client) Upload(ctx context.Context, file *multipart.FileHeader) (*minio
 
 	info, err := minioClient.PutObject(ctx,
 		config.StorageBucketName,
-		objectName, src, -1,
+		fmt.Sprintf("%d/%s", itemID, objectName),
+		src,
+		-1,
 		minio.PutObjectOptions{})
 	if err != nil {
-		return &info, err
+		return &info, objectName, err
 	}
 
 	log.Printf("%#v\n", info)
 
-	return &info, err
+	return &info, objectName, err
 }
 
-func (m *client) Download(ctx context.Context, filename string) (*minio.Object, string, error) {
+func (m *client) Download(ctx context.Context, filename string, itemID uint) (*minio.Object, string, error) {
 
 	ext := filepath.Ext(filename)
 
@@ -95,7 +97,7 @@ func (m *client) Download(ctx context.Context, filename string) (*minio.Object, 
 	return obj, getContentType(ext), err
 }
 
-func (m *client) Delete(ctx context.Context, filename string) error {
+func (m *client) Delete(ctx context.Context, filename string, itemID uint) error {
 	return minioClient.RemoveObject(ctx, config.StorageBucketName, filename, minio.RemoveObjectOptions{})
 	// cfags2e44nsipt7ajr40_322363807.jpg
 	// cfagql644nsipt7ajr3g_322363807.jpg
