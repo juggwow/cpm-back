@@ -10,6 +10,7 @@ import (
 	"cpm-rad-backend/domain/health_check"
 	"cpm-rad-backend/domain/logger"
 	"cpm-rad-backend/domain/minio"
+	"cpm-rad-backend/domain/raddoc"
 	"fmt"
 	"net/http"
 	"os"
@@ -152,5 +153,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.POST("/form", form.CreateHandler(form.Create(db)))
 
 	api.POST("/upload/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
+
+	api.GET("/listofdoc/:itemid", raddoc.GetByItemHandler(raddoc.GetByItem(db)))
 
 }
