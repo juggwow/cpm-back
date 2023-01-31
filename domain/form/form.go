@@ -155,3 +155,13 @@ func (f *FileAttach) ToModel(radID uint, createBy string) FileCreate {
 
 	return file
 }
+
+type DocType struct {
+	ID   uint   `json:"id" gorm:"column:ID"`
+	Name string `json:"name" gorm:"column:DESCRIPTION"`
+}
+type DocTypes []DocType
+
+func (DocType) TableName() string {
+	return "CPM.CPM_RAD_DOC_TYPE"
+}

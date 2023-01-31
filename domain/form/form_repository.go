@@ -98,3 +98,16 @@ func FileUpload(db *connection.DBConnection, m minio.Client) fileUploadFunc {
 		return result, err
 	}
 }
+
+func GetDocType(db *connection.DBConnection) getDocTypeFunc {
+	return func(ctx context.Context) (DocTypes, error) {
+		var result DocTypes
+		cpm := db.CPM.Model(&result)
+		err := cpm.Select("ID,DESCRIPTION").Scan(&result).Error
+		if err != nil {
+			return result, err
+		}
+
+		return result, err
+	}
+}

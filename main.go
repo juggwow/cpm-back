@@ -148,6 +148,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 
 	api.GET("/boq/:id", boq.GetItemByIDHandler(boq.GetItemByID(db)))
 	api.GET("/country", form.GetCountryHandler(form.GetCountry(db)))
+	api.GET("/doctype", form.GetDocTypeHandler(form.GetDocType(db)))
 	api.POST("/form", form.CreateHandler(form.Create(db)))
 
 	api.POST("/upload/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
