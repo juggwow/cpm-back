@@ -94,6 +94,7 @@ func FileUploadHandler(svc fileUploadFunc) echo.HandlerFunc {
 		files := form.File[fieldName]
 		// filePaths := []string{}
 		for _, file := range files {
+			// check file type pdf and size < 50 MB
 			src, err := file.Open()
 			if err != nil {
 				return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})

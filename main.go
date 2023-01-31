@@ -131,8 +131,6 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 	e.GET("/healths", health_check.HealthCheck)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	e.POST("/uploads/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
-
 	// if authenticator, err := auth.NewAuthenticator(); err == nil {
 	// 	e.GET("/auth", authenticator.AuthenHandler())
 	// 	e.GET("/auth/callback", authenticator.AuthenCallbackHandler(employee.GetAndCreateIfNotExist(db)))
@@ -151,5 +149,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.GET("/boq/:id", boq.GetItemByIDHandler(boq.GetItemByID(db)))
 	api.GET("/country", form.GetCountryHandler(form.GetCountry(db)))
 	api.POST("/form", form.CreateHandler(form.Create(db)))
+
+	api.POST("/upload/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
 
 }
