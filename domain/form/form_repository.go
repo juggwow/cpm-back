@@ -24,6 +24,8 @@ func Create(db *connection.DBConnection) createFunc {
 
 		err := db.CPM.Transaction(func(tx *gorm.DB) error {
 			radForm := req.ToModel()
+			filesAttach := req.FilesAttach
+
 			radForm.RadNo = fmt.Sprintf("rad-%d", radForm.ItemID)
 			// now := time.Now()
 			// radForm.CreatedDate = &now
@@ -37,7 +39,12 @@ func Create(db *connection.DBConnection) createFunc {
 			err := tx.Create(&radForm).Error
 			formID = radForm.ID
 
-			return err
+			for _, fileAttach := range filesAttach {
+				file := fileAttach.ToModel(formID, createdBy)
+				if err := tx.Create(&file).Error; err != nil {
+					return err
+				}
+			}
 
 			// if err := updateJobEmployees(tx, formID, &req, createdBy, getEmpByID); err != nil {
 			// 	return err
@@ -49,6 +56,7 @@ func Create(db *connection.DBConnection) createFunc {
 			// ).Pluck("Employee.DEPT_CHANGE_CODE", &deptChangeCode).Error; err != nil {
 			// 	return err
 			// }
+			return err
 		})
 
 		return formID, err
