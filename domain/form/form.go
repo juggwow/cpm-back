@@ -3,22 +3,25 @@ package form
 import (
 	"strings"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type Request struct {
-	ItemID       uint    `json:"itemID"`
-	Arrival      RadTime `json:"arrival"`
-	Inspection   RadTime `json:"inspection"`
-	TaskMaster   string  `json:"taskMaster"`
-	Invoice      string  `json:"invoice"`
-	Quantity     uint    `json:"quantity"`
-	Country      string  `json:"country"`
-	Manufacturer string  `json:"manufacturer"`
-	Model        string  `json:"model"`
-	Serial       string  `json:"serial"`
-	PeaNo        string  `json:"peano"`
-	CreateBy     string  `json:"createby"`
-	Status       int     `json:"status"`
+	ItemID       uint        `json:"itemID"`
+	Arrival      RadTime     `json:"arrival"`
+	Inspection   RadTime     `json:"inspection"`
+	TaskMaster   string      `json:"taskMaster"`
+	Invoice      string      `json:"invoice"`
+	Quantity     uint        `json:"quantity"`
+	Country      string      `json:"country"`
+	Manufacturer string      `json:"manufacturer"`
+	Model        string      `json:"model"`
+	Serial       string      `json:"serial"`
+	PeaNo        string      `json:"peano"`
+	CreateBy     string      `json:"createby"`
+	Status       int         `json:"status"`
+	FilesAttach  FilesAttach `json:"filesAttach"`
 }
 
 type RadTime time.Time
@@ -105,3 +108,60 @@ type FileUploadResponse struct {
 }
 
 type FileUploadResponses []FileUploadResponse
+
+type FileAttach struct {
+	Name string `json:"name"`
+	Size string `json:"size"`
+	Unit string `json:"unit"`
+	Path string `json:"filePath"`
+	Type uint   `json:"type"`
+}
+
+type FilesAttach []FileAttach
+
+type File struct {
+	RadID   uint            `gorm:"column:RAD_ID"`
+	DocType uint            `gorm:"column:RAD_DOC_TYPE_ID"`
+	Name    string          `gorm:"column:FILE_NAME"`
+	Size    decimal.Decimal `gorm:"column:FILE_SIZE"`
+	Unit    string          `gorm:"column:FILE_UNIT"`
+	Path    string          `gorm:"column:FILE_PATH"`
+}
+type FileCreate struct {
+	RadID    uint            `gorm:"column:RAD_ID"`
+	DocType  uint            `gorm:"column:RAD_DOC_TYPE_ID"`
+	Name     string          `gorm:"column:FILE_NAME"`
+	Size     decimal.Decimal `gorm:"column:FILE_SIZE"`
+	Unit     string          `gorm:"column:FILE_UNIT"`
+	Path     string          `gorm:"column:FILE_PATH"`
+	CreateBy string          `gorm:"column:CREATED_BY"`
+}
+
+func (FileCreate) TableName() string {
+	return "CPM.CPM_WORK_CONTRACT_RAD_FILE"
+}
+
+func (f *FileAttach) ToModel(radID uint, createBy string) FileCreate {
+	size, _ := decimal.NewFromString(f.Size)
+	file := FileCreate{
+		RadID:    radID,
+		DocType:  f.Type,
+		Name:     f.Name,
+		Size:     size,
+		Unit:     f.Unit,
+		Path:     f.Path,
+		CreateBy: createBy,
+	}
+
+	return file
+}
+
+type DocType struct {
+	ID   uint   `json:"id" gorm:"column:ID"`
+	Name string `json:"name" gorm:"column:DESCRIPTION"`
+}
+type DocTypes []DocType
+
+func (DocType) TableName() string {
+	return "CPM.CPM_RAD_DOC_TYPE"
+}

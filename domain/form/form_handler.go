@@ -111,3 +111,22 @@ func FileUploadHandler(svc fileUploadFunc) echo.HandlerFunc {
 		return c.JSON(http.StatusOK, fus)
 	}
 }
+
+type getDocTypeFunc func(context.Context) (DocTypes, error)
+
+func (fn getDocTypeFunc) GetDocType(ctx context.Context) (DocTypes, error) {
+	return fn(ctx)
+}
+
+func GetDocTypeHandler(svc getDocTypeFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+
+		docTypes, err := svc.GetDocType(c.Request().Context())
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
+		}
+		return c.JSON(http.StatusOK, docTypes)
+	}
+}

@@ -14,3 +14,11 @@ type Data[T any] struct {
 	Limit int   `json:"limit"`
 	Total int64 `json:"total"`
 }
+
+type DataDoc[I any, D any] struct {
+	Item  I     `json:"item"`
+	DOC   D     `json:"doc"`
+	Page  int   `json:"page"`
+	Limit int   `json:"limit"`
+	Total int64 `json:"total"`
+}
