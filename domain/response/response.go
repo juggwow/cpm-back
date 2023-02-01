@@ -8,6 +8,10 @@ type Error struct {
 	Error string `json:"error"`
 }
 
+// type Delete struct {
+// 	Massage string `json:"del" default:"success"`
+// }
+
 type Data[T any] struct {
 	Data  []T   `json:"data"`
 	Page  int   `json:"page"`

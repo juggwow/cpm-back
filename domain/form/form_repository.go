@@ -111,3 +111,12 @@ func GetDocType(db *connection.DBConnection) getDocTypeFunc {
 		return result, err
 	}
 }
+
+func FileDelete(db *connection.DBConnection, m minio.Client) fileDeleteFunc {
+	return func(ctx context.Context, itemID int, objectName string) error {
+		// var result FileUploadResponse
+		err := m.Delete(ctx, objectName, uint(itemID))
+
+		return err
+	}
+}
