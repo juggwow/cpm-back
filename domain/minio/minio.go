@@ -97,8 +97,8 @@ func (m *client) Download(ctx context.Context, filename string, itemID uint) (*m
 	return obj, getContentType(ext), err
 }
 
-func (m *client) Delete(ctx context.Context, filename string, itemID uint) error {
-	return minioClient.RemoveObject(ctx, config.StorageBucketName, filename, minio.RemoveObjectOptions{})
+func (m *client) Delete(ctx context.Context, objectName string, itemID uint) error {
+	return minioClient.RemoveObject(ctx, config.StorageBucketName, objectName, minio.RemoveObjectOptions{})
 	// cfags2e44nsipt7ajr40_322363807.jpg
 	// cfagql644nsipt7ajr3g_322363807.jpg
 	// cfah4cu44nsi942tvdrg_322363807.jpg

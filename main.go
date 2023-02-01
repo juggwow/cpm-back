@@ -153,6 +153,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.POST("/form", form.CreateHandler(form.Create(db)))
 
 	api.POST("/upload/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
+	api.DELETE("/delete/:itemid", form.FileDeleteHandler(form.FileDelete(db, minioClient)))
 
 	api.GET("/listofdoc/:itemid", raddoc.GetByItemHandler(raddoc.GetByItem(db)))
 

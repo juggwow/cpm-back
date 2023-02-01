@@ -130,3 +130,31 @@ func GetDocTypeHandler(svc getDocTypeFunc) echo.HandlerFunc {
 		return c.JSON(http.StatusOK, docTypes)
 	}
 }
+
+type fileDeleteFunc func(context.Context, int, string) error
+
+func (fn fileDeleteFunc) FileDelete(ctx context.Context, itemID int, objectName string) error {
+	return fn(ctx, itemID, objectName)
+}
+
+func FileDeleteHandler(svc fileDeleteFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// var fus FileUploadResponses
+		log := logger.Unwrap(c)
+
+		itemID, err := strconv.Atoi(c.Param("itemid"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.String(http.StatusBadRequest, fmt.Sprintf("file err : %s", err.Error()))
+		}
+		objectName := c.QueryParam("obj")
+
+		err = svc.FileDelete(c.Request().Context(), itemID, objectName)
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+		}
+
+		return c.String(http.StatusOK, "success")
+	}
+}
