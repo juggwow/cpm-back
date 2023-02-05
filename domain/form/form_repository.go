@@ -2,6 +2,7 @@ package form
 
 import (
 	"context"
+	"cpm-rad-backend/domain/boq"
 	"cpm-rad-backend/domain/connection"
 	"cpm-rad-backend/domain/minio"
 	"fmt"
@@ -60,6 +61,36 @@ func Create(db *connection.DBConnection) createFunc {
 		})
 
 		return formID, err
+	}
+}
+
+func Get(db *connection.DBConnection) getFunc {
+	return func(ctx context.Context, id uint) (Response, error) {
+		var res Response
+		var result Form
+
+		cpm := db.CPM.Model(&result)
+		err := cpm.Where("ID = ?", id).Scan(&result).Error
+		if err != nil {
+			return res, err
+		}
+
+		var item boq.ItemResponse
+		cpm = db.CPM.Model(&item)
+		err = cpm.Where("ID = ?", result.ItemID).Scan(&item).Error
+		if err != nil {
+			return res, err
+		}
+
+		var file Files
+		cpm = db.CPM.Model(&file)
+		err = cpm.Where("RAD_ID = ? AND DEL_FLAG = 'N'", result.ID).Scan(&file).Error
+		if err != nil {
+			return res, err
+		}
+
+		res = result.ToResponse(file, item)
+		return res, err
 	}
 }
 

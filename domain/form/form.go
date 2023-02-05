@@ -1,6 +1,7 @@
 package form
 
 import (
+	"cpm-rad-backend/domain/boq"
 	"strings"
 	"time"
 
@@ -22,6 +23,47 @@ type Request struct {
 	CreateBy     string      `json:"createby"`
 	Status       int         `json:"status"`
 	FilesAttach  FilesAttach `json:"filesAttach"`
+}
+
+type Response struct {
+	ID           uint            `json:"id"`
+	ItemID       uint            `json:"itemID"`
+	ItemName     string          `json:"itemName"`
+	ItemQty      decimal.Decimal `json:"itemQty"`
+	ItemUnit     string          `json:"itemUnit"`
+	Arrival      RadTime         `json:"arrival"`
+	Inspection   RadTime         `json:"inspection"`
+	TaskMaster   string          `json:"taskMaster"`
+	Invoice      string          `json:"invoice"`
+	Qty          uint            `json:"quantity"`
+	Country      string          `json:"country"`
+	Manufacturer string          `json:"manufacturer"`
+	Model        string          `json:"model"`
+	Serial       string          `json:"serial"`
+	PeaNo        string          `json:"peano"`
+	Files        Files           `json:"filesAttach"`
+}
+
+func (form *Form) ToResponse(file Files, item boq.ItemResponse) Response {
+	res := Response{
+		ID:           form.ID,
+		ItemID:       form.ItemID,
+		ItemName:     item.ItemName,
+		ItemQty:      item.ItemQuantity,
+		ItemUnit:     item.ItemUnit,
+		Arrival:      RadTime(form.Arrival),
+		Inspection:   RadTime(form.Inspection),
+		TaskMaster:   form.TaskMaster,
+		Invoice:      form.Invoice,
+		Qty:          form.Quantity,
+		Country:      form.Country,
+		Manufacturer: form.Manufacturer,
+		Model:        form.Model,
+		Serial:       form.Serial,
+		PeaNo:        form.PeaNo,
+		Files:        file,
+	}
+	return res
 }
 
 type RadTime time.Time
@@ -120,6 +162,7 @@ type FileAttach struct {
 type FilesAttach []FileAttach
 
 type File struct {
+	ID      uint            `gorm:"column:ID"`
 	RadID   uint            `gorm:"column:RAD_ID"`
 	DocType uint            `gorm:"column:RAD_DOC_TYPE_ID"`
 	Name    string          `gorm:"column:FILE_NAME"`
@@ -127,6 +170,13 @@ type File struct {
 	Unit    string          `gorm:"column:FILE_UNIT"`
 	Path    string          `gorm:"column:FILE_PATH"`
 }
+
+type Files []File
+
+func (File) TableName() string {
+	return "CPM.CPM_WORK_CONTRACT_RAD_FILE"
+}
+
 type FileCreate struct {
 	RadID    uint            `gorm:"column:RAD_ID"`
 	DocType  uint            `gorm:"column:RAD_DOC_TYPE_ID"`
