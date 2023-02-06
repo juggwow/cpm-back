@@ -77,6 +77,45 @@ func GetHandler(svc getFunc) echo.HandlerFunc {
 	}
 }
 
+type updateFunc func(context.Context, UpdateRequest) error
+
+func (fn updateFunc) Update(ctx context.Context, req UpdateRequest) error {
+	return fn(ctx, req)
+}
+
+func UpdateHandler(svc updateFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var req UpdateRequest
+		log := logger.Unwrap(c)
+		if err := c.Bind(&req); err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+		}
+
+		if invalidUpdateRequest(&req) {
+			return c.JSON(http.StatusBadRequest, response.Error{Error: fmt.Sprint(req)})
+		}
+
+		// claims, _ := auth.GetAuthorizedClaims(c)
+		// jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
+		err := svc.Update(c.Request().Context(), req)
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
+		}
+
+		return c.String(http.StatusOK, "success")
+	}
+}
+
+func invalidUpdateRequest(req *UpdateRequest) bool {
+	// if req.ItemID == 0 {
+	// 	return true
+	// }
+
+	return req.ID == 0
+}
+
 type getCountryFunc func(context.Context) (Countrys, error)
 
 func (fn getCountryFunc) GetCountry(ctx context.Context) (Countrys, error) {
