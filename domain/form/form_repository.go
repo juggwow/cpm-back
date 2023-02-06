@@ -38,7 +38,9 @@ func Create(db *connection.DBConnection) createFunc {
 			// if err := tx.Omit("EmployeeJobs", "JobStatus").Create(&radForm).Error; err != nil {
 			// 	return err
 			// }
-			err := tx.Create(&radForm).Error
+			if err := tx.Omit("UpdateBy", "UpdateDate").Create(&radForm).Error; err != nil {
+				return err
+			}
 			formID = radForm.ID
 
 			for _, fileAttach := range filesAttach {
@@ -58,7 +60,7 @@ func Create(db *connection.DBConnection) createFunc {
 			// ).Pluck("Employee.DEPT_CHANGE_CODE", &deptChangeCode).Error; err != nil {
 			// 	return err
 			// }
-			return err
+			return nil
 		})
 
 		return formID, err
