@@ -51,6 +51,71 @@ func invalidRequest(req *Request) bool {
 	return req.ItemID == 0
 }
 
+type getFunc func(context.Context, uint) (Response, error)
+
+func (fn getFunc) Get(ctx context.Context, id uint) (Response, error) {
+	return fn(ctx, id)
+}
+
+func GetHandler(svc getFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.String(http.StatusBadRequest, fmt.Sprintf("require id : %s", err.Error()))
+		}
+
+		res, err := svc.Get(c.Request().Context(), uint(id))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
+		}
+
+		return c.JSON(http.StatusOK, res)
+	}
+}
+
+type updateFunc func(context.Context, UpdateRequest) error
+
+func (fn updateFunc) Update(ctx context.Context, req UpdateRequest) error {
+	return fn(ctx, req)
+}
+
+func UpdateHandler(svc updateFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var req UpdateRequest
+		log := logger.Unwrap(c)
+		if err := c.Bind(&req); err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+		}
+
+		if invalidUpdateRequest(&req) {
+			return c.JSON(http.StatusBadRequest, response.Error{Error: fmt.Sprint(req)})
+		}
+
+		// claims, _ := auth.GetAuthorizedClaims(c)
+		// jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
+		err := svc.Update(c.Request().Context(), req)
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
+		}
+
+		return c.String(http.StatusOK, "success")
+	}
+}
+
+func invalidUpdateRequest(req *UpdateRequest) bool {
+	// if req.ItemID == 0 {
+	// 	return true
+	// }
+
+	return req.ID == 0
+}
+
 type getCountryFunc func(context.Context) (Countrys, error)
 
 func (fn getCountryFunc) GetCountry(ctx context.Context) (Countrys, error) {

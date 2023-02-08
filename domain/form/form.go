@@ -1,6 +1,7 @@
 package form
 
 import (
+	"cpm-rad-backend/domain/boq"
 	"strings"
 	"time"
 
@@ -24,6 +25,63 @@ type Request struct {
 	FilesAttach  FilesAttach `json:"filesAttach"`
 }
 
+type UpdateRequest struct {
+	ID           uint        `json:"id"`
+	Arrival      RadTime     `json:"arrival"`
+	Inspection   RadTime     `json:"inspection"`
+	TaskMaster   string      `json:"taskMaster"`
+	Invoice      string      `json:"invoice"`
+	Quantity     uint        `json:"quantity"`
+	Country      string      `json:"country"`
+	Manufacturer string      `json:"manufacturer"`
+	Model        string      `json:"model"`
+	Serial       string      `json:"serial"`
+	PeaNo        string      `json:"peano"`
+	Status       int         `json:"status"`
+	File         FilesAttach `json:"file"`
+}
+
+type Response struct {
+	ID           uint            `json:"id"`
+	ItemID       uint            `json:"itemID"`
+	ItemName     string          `json:"itemName"`
+	ItemQty      decimal.Decimal `json:"itemQty"`
+	ItemUnit     string          `json:"itemUnit"`
+	Arrival      RadTime         `json:"arrival"`
+	Inspection   RadTime         `json:"inspection"`
+	TaskMaster   string          `json:"taskMaster"`
+	Invoice      string          `json:"invoice"`
+	Qty          uint            `json:"quantity"`
+	Country      string          `json:"country"`
+	Manufacturer string          `json:"manufacturer"`
+	Model        string          `json:"model"`
+	Serial       string          `json:"serial"`
+	PeaNo        string          `json:"peano"`
+	Files        Files           `json:"filesAttach"`
+}
+
+func (form *Form) ToResponse(file Files, item boq.ItemResponse) Response {
+	res := Response{
+		ID:           form.ID,
+		ItemID:       form.ItemID,
+		ItemName:     item.ItemName,
+		ItemQty:      item.ItemQuantity,
+		ItemUnit:     item.ItemUnit,
+		Arrival:      RadTime(form.Arrival),
+		Inspection:   RadTime(form.Inspection),
+		TaskMaster:   form.TaskMaster,
+		Invoice:      form.Invoice,
+		Qty:          form.Quantity,
+		Country:      form.Country,
+		Manufacturer: form.Manufacturer,
+		Model:        form.Model,
+		Serial:       form.Serial,
+		PeaNo:        form.PeaNo,
+		Files:        file,
+	}
+	return res
+}
+
 type RadTime time.Time
 
 type Country struct {
@@ -39,21 +97,23 @@ func (Country) TableName() string {
 }
 
 type Form struct {
-	ID           uint      `gorm:"column:ID"`
-	ItemID       uint      `gorm:"column:BOQ_ID"`
-	RadNo        string    `gorm:"column:RAD_NO"`
-	Arrival      time.Time `gorm:"column:ARRIVAL_DATE_AT_SITE"`
-	Inspection   time.Time `gorm:"column:INSPECTION_DATE"`
-	TaskMaster   string    `gorm:"column:NAME_OF_TASKMASTER"`
-	Invoice      string    `gorm:"column:CONTRACTOR_INV_NO"`
-	Quantity     uint      `gorm:"column:QUANTITY"`
-	Country      string    `gorm:"column:COUNTRY"`
-	Manufacturer string    `gorm:"column:MANUFACTURER"`
-	Model        string    `gorm:"column:MODEL"`
-	Serial       string    `gorm:"column:SERIAL_NO"`
-	PeaNo        string    `gorm:"column:PEA_NO"`
-	CreateBy     string    `gorm:"column:CREATED_BY"`
-	Status       int       `gorm:"column:STATE_ID"`
+	ID           uint       `gorm:"column:ID"`
+	ItemID       uint       `gorm:"column:BOQ_ID"`
+	RadNo        string     `gorm:"column:RAD_NO"`
+	Arrival      time.Time  `gorm:"column:ARRIVAL_DATE_AT_SITE"`
+	Inspection   time.Time  `gorm:"column:INSPECTION_DATE"`
+	TaskMaster   string     `gorm:"column:NAME_OF_TASKMASTER"`
+	Invoice      string     `gorm:"column:CONTRACTOR_INV_NO"`
+	Quantity     uint       `gorm:"column:QUANTITY"`
+	Country      string     `gorm:"column:COUNTRY"`
+	Manufacturer string     `gorm:"column:MANUFACTURER"`
+	Model        string     `gorm:"column:MODEL"`
+	Serial       string     `gorm:"column:SERIAL_NO"`
+	PeaNo        string     `gorm:"column:PEA_NO"`
+	CreateBy     string     `gorm:"column:CREATED_BY"`
+	UpdateBy     string     `gorm:"column:UPDATED_BY"`
+	UpdateDate   *time.Time `gorm:"column:UPDATED_DATE"`
+	Status       int        `gorm:"column:STATE_ID"`
 }
 
 func (Form) TableName() string {
@@ -63,6 +123,25 @@ func (Form) TableName() string {
 func (req *Request) ToModel() Form {
 	form := Form{
 		ItemID:       req.ItemID,
+		Arrival:      time.Time(req.Arrival),
+		Inspection:   time.Time(req.Inspection),
+		TaskMaster:   req.TaskMaster,
+		Invoice:      req.Invoice,
+		Quantity:     req.Quantity,
+		Country:      req.Country,
+		Manufacturer: req.Manufacturer,
+		Model:        req.Model,
+		Serial:       req.Serial,
+		PeaNo:        req.PeaNo,
+		Status:       req.Status,
+	}
+
+	return form
+}
+
+func (req *UpdateRequest) ToModel() Form {
+	form := Form{
+		ID:           req.ID,
 		Arrival:      time.Time(req.Arrival),
 		Inspection:   time.Time(req.Inspection),
 		TaskMaster:   req.TaskMaster,
@@ -110,6 +189,7 @@ type FileUploadResponse struct {
 type FileUploadResponses []FileUploadResponse
 
 type FileAttach struct {
+	ID   uint   `json:"id"`
 	Name string `json:"name"`
 	Size string `json:"size"`
 	Unit string `json:"unit"`
@@ -120,6 +200,7 @@ type FileAttach struct {
 type FilesAttach []FileAttach
 
 type File struct {
+	ID      uint            `gorm:"column:ID"`
 	RadID   uint            `gorm:"column:RAD_ID"`
 	DocType uint            `gorm:"column:RAD_DOC_TYPE_ID"`
 	Name    string          `gorm:"column:FILE_NAME"`
@@ -127,6 +208,13 @@ type File struct {
 	Unit    string          `gorm:"column:FILE_UNIT"`
 	Path    string          `gorm:"column:FILE_PATH"`
 }
+
+type Files []File
+
+func (File) TableName() string {
+	return "CPM.CPM_WORK_CONTRACT_RAD_FILE"
+}
+
 type FileCreate struct {
 	RadID    uint            `gorm:"column:RAD_ID"`
 	DocType  uint            `gorm:"column:RAD_DOC_TYPE_ID"`
@@ -154,6 +242,33 @@ func (f *FileAttach) ToModel(radID uint, createBy string) FileCreate {
 	}
 
 	return file
+}
+
+func (f *File) ToModel(radID uint, createBy string) FileCreate {
+	// size, _ := decimal.NewFromString(f.Size)
+	file := FileCreate{
+		RadID:    radID,
+		DocType:  f.DocType,
+		Name:     f.Name,
+		Size:     f.Size,
+		Unit:     f.Unit,
+		Path:     f.Path,
+		CreateBy: createBy,
+	}
+
+	return file
+}
+
+type FileUpdate struct {
+	ID         uint       `gorm:"column:ID"`
+	DocType    uint       `gorm:"column:RAD_DOC_TYPE_ID"`
+	UpdateBy   string     `gorm:"column:UPDATED_BY"`
+	UpdateDate *time.Time `gorm:"column:UPDATED_DATE"`
+	DelFlag    string     `gorm:"column:DEL_FLAG"`
+}
+
+func (FileUpdate) TableName() string {
+	return "CPM.CPM_WORK_CONTRACT_RAD_FILE"
 }
 
 type DocType struct {
