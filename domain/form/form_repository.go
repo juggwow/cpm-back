@@ -163,11 +163,12 @@ func Get(db *connection.DBConnection) getFunc {
 }
 
 func GetCountry(db *connection.DBConnection) getCountryFunc {
-	return func(ctx context.Context) (Countrys, error) {
+	return func(ctx context.Context, filter string) (Countrys, error) {
 		var result Countrys
 		cpm := db.CPM.Model(&result)
-		err := cpm.Table(`WDDEVDB\WORKD.CPM.CPM.COUNTRY`).
-			Select("ID,CODE,NAME").Scan(&result).Error
+		err := cpm.Table("CPM.fGetCountry(?)", filter).
+			Scan(&result).
+			Error
 		if err != nil {
 			return result, err
 		}

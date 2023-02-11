@@ -116,17 +116,17 @@ func invalidUpdateRequest(req *UpdateRequest) bool {
 	return req.ID == 0
 }
 
-type getCountryFunc func(context.Context) (Countrys, error)
+type getCountryFunc func(context.Context, string) (Countrys, error)
 
-func (fn getCountryFunc) GetCountry(ctx context.Context) (Countrys, error) {
-	return fn(ctx)
+func (fn getCountryFunc) GetCountry(ctx context.Context, filter string) (Countrys, error) {
+	return fn(ctx, filter)
 }
 
 func GetCountryHandler(svc getCountryFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log := logger.Unwrap(c)
-
-		countrys, err := svc.GetCountry(c.Request().Context())
+		filter := c.QueryParam("filter")
+		countrys, err := svc.GetCountry(c.Request().Context(), filter)
 		if err != nil {
 			log.Error(err.Error())
 			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})

@@ -92,10 +92,6 @@ type Country struct {
 
 type Countrys []Country
 
-func (Country) TableName() string {
-	return `[WDDEVDB\WORKD].CPM.CPM.COUNTRY`
-}
-
 type Form struct {
 	ID           uint       `gorm:"column:ID"`
 	ItemID       uint       `gorm:"column:BOQ_ID"`
