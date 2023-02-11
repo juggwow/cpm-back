@@ -2,6 +2,7 @@ package form
 
 import (
 	"cpm-rad-backend/domain/boq"
+	"io"
 	"strings"
 	"time"
 
@@ -92,10 +93,6 @@ type Country struct {
 
 type Countrys []Country
 
-func (Country) TableName() string {
-	return `[WDDEVDB\WORKD].CPM.CPM.COUNTRY`
-}
-
 type Form struct {
 	ID           uint       `gorm:"column:ID"`
 	ItemID       uint       `gorm:"column:BOQ_ID"`
@@ -114,6 +111,7 @@ type Form struct {
 	UpdateBy     string     `gorm:"column:UPDATED_BY"`
 	UpdateDate   *time.Time `gorm:"column:UPDATED_DATE"`
 	Status       int        `gorm:"column:STATE_ID"`
+	DelFlag      string     `gorm:"column:DEL_FLAG"`
 }
 
 func (Form) TableName() string {
@@ -153,6 +151,24 @@ func (req *UpdateRequest) ToModel() Form {
 		Serial:       req.Serial,
 		PeaNo:        req.PeaNo,
 		Status:       req.Status,
+	}
+
+	return form
+}
+
+type deleteForm struct {
+	ID         uint
+	DelFlag    string
+	UpdateBy   string
+	UpdateDate *time.Time
+}
+
+func (df *deleteForm) ToModel() Form {
+	form := Form{
+		ID:         df.ID,
+		UpdateBy:   df.UpdateBy,
+		UpdateDate: df.UpdateDate,
+		DelFlag:    df.DelFlag,
 	}
 
 	return form
@@ -279,4 +295,10 @@ type DocTypes []DocType
 
 func (DocType) TableName() string {
 	return "CPM.CPM_RAD_DOC_TYPE"
+}
+
+type FileResponse struct {
+	Obj  io.Reader
+	Ext  string
+	Name string
 }

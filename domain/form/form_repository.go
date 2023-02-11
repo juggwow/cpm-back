@@ -128,9 +128,42 @@ func Update(db *connection.DBConnection) updateFunc {
 	}
 }
 
-// func () BeforeUpdate {
+func Delete(db *connection.DBConnection) dateteFunc {
+	return func(ctx context.Context, id uint) error {
 
-// }
+		// getEmpFromDB := employee.GetByID(db)
+		// getEmpByID := func(empID string) (employee.Employee, error) {
+		// 	return getEmpFromDB(ctx, empID)
+		// }
+		var delForm deleteForm
+		err := db.CPM.Transaction(func(tx *gorm.DB) error {
+			delForm.ID = id
+			delForm.UpdateBy = "คนลบ เอกสาร"
+			now := time.Now()
+			delForm.UpdateDate = &now
+			delForm.DelFlag = "Y"
+
+			form := delForm.ToModel()
+			if err := tx.Updates(&form).Error; err != nil {
+				return err
+			}
+
+			// if err := updateJobEmployees(tx, formID, &req, createdBy, getEmpByID); err != nil {
+			// 	return err
+			// }
+
+			// deptChangeCode := ""
+			// if err := tx.Model(&employee_job.EmployeeJob{}).Joins("Employee").Joins("EmployeeRole").Where(
+			// 	"CMDC_JOB_ID = ? AND EmployeeRole.ROLE_NAME_ENG = ?", formID, employee_role.SUPERVISOR,
+			// ).Pluck("Employee.DEPT_CHANGE_CODE", &deptChangeCode).Error; err != nil {
+			// 	return err
+			// }
+			return nil
+		})
+
+		return err
+	}
+}
 
 func Get(db *connection.DBConnection) getFunc {
 	return func(ctx context.Context, id uint) (Response, error) {
@@ -163,11 +196,12 @@ func Get(db *connection.DBConnection) getFunc {
 }
 
 func GetCountry(db *connection.DBConnection) getCountryFunc {
-	return func(ctx context.Context) (Countrys, error) {
+	return func(ctx context.Context, filter string) (Countrys, error) {
 		var result Countrys
 		cpm := db.CPM.Model(&result)
-		err := cpm.Table(`WDDEVDB\WORKD.CPM.CPM.COUNTRY`).
-			Select("ID,CODE,NAME").Scan(&result).Error
+		err := cpm.Table("CPM.fGetCountry(?)", filter).
+			Scan(&result).
+			Error
 		if err != nil {
 			return result, err
 		}
@@ -217,5 +251,25 @@ func FileDelete(db *connection.DBConnection, m minio.Client) fileDeleteFunc {
 		err := m.Delete(ctx, objectName, uint(itemID))
 
 		return err
+	}
+}
+
+func FileDownload(db *connection.DBConnection, m minio.Client) fileDownloadFunc {
+	return func(ctx context.Context, fileID uint) (FileResponse, error) {
+		var result File
+		var fileResponse FileResponse
+		cpm := db.CPM.Model(&result)
+		err := cpm.Where("ID = ?", fileID).Scan(&result).Error
+		if err != nil {
+			return fileResponse, err
+		}
+
+		obj, ext, err := m.Download(ctx, result.Path)
+		fileResponse = FileResponse{
+			Obj:  obj,
+			Ext:  ext,
+			Name: result.Name,
+		}
+		return fileResponse, err
 	}
 }

@@ -116,17 +116,44 @@ func invalidUpdateRequest(req *UpdateRequest) bool {
 	return req.ID == 0
 }
 
-type getCountryFunc func(context.Context) (Countrys, error)
+type dateteFunc func(context.Context, uint) error
 
-func (fn getCountryFunc) GetCountry(ctx context.Context) (Countrys, error) {
-	return fn(ctx)
+func (fn dateteFunc) Delete(ctx context.Context, id uint) error {
+	return fn(ctx, id)
+}
+
+func DeleteHandler(svc dateteFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.String(http.StatusBadRequest, fmt.Sprintf("require id : %s", err.Error()))
+		}
+
+		// claims, _ := auth.GetAuthorizedClaims(c)
+		// jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
+		err = svc.Delete(c.Request().Context(), uint(id))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
+		}
+
+		return c.String(http.StatusOK, "success")
+	}
+}
+
+type getCountryFunc func(context.Context, string) (Countrys, error)
+
+func (fn getCountryFunc) GetCountry(ctx context.Context, filter string) (Countrys, error) {
+	return fn(ctx, filter)
 }
 
 func GetCountryHandler(svc getCountryFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log := logger.Unwrap(c)
-
-		countrys, err := svc.GetCountry(c.Request().Context())
+		filter := c.QueryParam("filter")
+		countrys, err := svc.GetCountry(c.Request().Context(), filter)
 		if err != nil {
 			log.Error(err.Error())
 			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
@@ -221,5 +248,34 @@ func FileDeleteHandler(svc fileDeleteFunc) echo.HandlerFunc {
 		}
 
 		return c.String(http.StatusOK, "success")
+	}
+}
+
+type fileDownloadFunc func(context.Context, uint) (FileResponse, error)
+
+func (fn fileDownloadFunc) FileDownload(ctx context.Context, fileID uint) (FileResponse, error) {
+	return fn(ctx, fileID)
+}
+
+func FileDownloadHandler(svc fileDownloadFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// var fus FileUploadResponses
+		log := logger.Unwrap(c)
+
+		fileID, err := strconv.Atoi(c.Param("fileid"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.String(http.StatusBadRequest, fmt.Sprintf("file err : %s", err.Error()))
+		}
+		// objectName := c.QueryParam("obj")
+
+		res, err := svc.FileDownload(c.Request().Context(), uint(fileID))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+		}
+
+		c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", res.Name))
+		return c.Stream(http.StatusOK, res.Ext, res.Obj)
 	}
 }
