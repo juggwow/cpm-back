@@ -2,6 +2,7 @@ package form
 
 import (
 	"cpm-rad-backend/domain/boq"
+	"io"
 	"strings"
 	"time"
 
@@ -294,4 +295,10 @@ type DocTypes []DocType
 
 func (DocType) TableName() string {
 	return "CPM.CPM_RAD_DOC_TYPE"
+}
+
+type FileResponse struct {
+	Obj  io.Reader
+	Ext  string
+	Name string
 }

@@ -250,3 +250,32 @@ func FileDeleteHandler(svc fileDeleteFunc) echo.HandlerFunc {
 		return c.String(http.StatusOK, "success")
 	}
 }
+
+type fileDownloadFunc func(context.Context, uint) (FileResponse, error)
+
+func (fn fileDownloadFunc) FileDownload(ctx context.Context, fileID uint) (FileResponse, error) {
+	return fn(ctx, fileID)
+}
+
+func FileDownloadHandler(svc fileDownloadFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// var fus FileUploadResponses
+		log := logger.Unwrap(c)
+
+		fileID, err := strconv.Atoi(c.Param("fileid"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.String(http.StatusBadRequest, fmt.Sprintf("file err : %s", err.Error()))
+		}
+		// objectName := c.QueryParam("obj")
+
+		res, err := svc.FileDownload(c.Request().Context(), uint(fileID))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+		}
+
+		c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", res.Name))
+		return c.Stream(http.StatusOK, res.Ext, res.Obj)
+	}
+}

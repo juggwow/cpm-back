@@ -51,7 +51,7 @@ func GetClient() Client {
 type Client interface {
 	Upload(ctx context.Context, file *multipart.FileHeader, itemID uint) (*minio.UploadInfo, string, error)
 	Delete(ctx context.Context, filename string, itemID uint) error
-	Download(ctx context.Context, filename string, itemID uint) (*minio.Object, string, error)
+	Download(ctx context.Context, filename string) (*minio.Object, string, error)
 }
 
 func (m *client) Upload(ctx context.Context, file *multipart.FileHeader, itemID uint) (*minio.UploadInfo, string, error) {
@@ -78,7 +78,7 @@ func (m *client) Upload(ctx context.Context, file *multipart.FileHeader, itemID 
 	return &info, objectName, err
 }
 
-func (m *client) Download(ctx context.Context, filename string, itemID uint) (*minio.Object, string, error) {
+func (m *client) Download(ctx context.Context, filename string) (*minio.Object, string, error) {
 
 	ext := filepath.Ext(filename)
 
@@ -92,7 +92,7 @@ func (m *client) Download(ctx context.Context, filename string, itemID uint) (*m
 		return nil, "", err
 	}
 
-	defer obj.Close()
+	// defer obj.Close()
 	// return c.Stream(http.StatusOK, getContentType(ext), obj)
 	return obj, getContentType(ext), err
 }
@@ -113,6 +113,10 @@ func getContentType(ext string) string {
 
 	if lowerExt == ".jpg" || lowerExt == ".jpeg" {
 		return "image/jpeg"
+	}
+
+	if lowerExt == ".pdf" {
+		return "application/pdf"
 	}
 
 	return "application/octet-stream"

@@ -253,3 +253,23 @@ func FileDelete(db *connection.DBConnection, m minio.Client) fileDeleteFunc {
 		return err
 	}
 }
+
+func FileDownload(db *connection.DBConnection, m minio.Client) fileDownloadFunc {
+	return func(ctx context.Context, fileID uint) (FileResponse, error) {
+		var result File
+		var fileResponse FileResponse
+		cpm := db.CPM.Model(&result)
+		err := cpm.Where("ID = ?", fileID).Scan(&result).Error
+		if err != nil {
+			return fileResponse, err
+		}
+
+		obj, ext, err := m.Download(ctx, result.Path)
+		fileResponse = FileResponse{
+			Obj:  obj,
+			Ext:  ext,
+			Name: result.Name,
+		}
+		return fileResponse, err
+	}
+}
