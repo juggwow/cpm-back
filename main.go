@@ -11,7 +11,6 @@ import (
 	"cpm-rad-backend/domain/logger"
 	"cpm-rad-backend/domain/minio"
 	"cpm-rad-backend/domain/raddoc"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -122,12 +121,6 @@ func getRoute(zaplog *zap.Logger) *echo.Echo {
 }
 
 func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.Client) {
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!!")
-	})
-	e.GET("/db", func(c echo.Context) error {
-		return c.String(http.StatusOK, fmt.Sprintf("Hello, DB!! >>> %v", config.DBCpm))
-	})
 
 	e.GET("/healths", health_check.HealthCheck)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
@@ -143,7 +136,6 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 
 func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.Client) {
 
-	//fmt.Print(db)
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
 	api.GET("/contract/:id/boq", boq.GetHandler(boq.Get(db)))
 
@@ -152,7 +144,8 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.GET("/doctype", form.GetDocTypeHandler(form.GetDocType(db)))
 	api.POST("/form", form.CreateHandler(form.Create(db)))
 	api.GET("/form/:id", form.GetHandler(form.Get(db)))
-	api.PUT("/form", form.UpdateHandler(form.Update(db)))
+	api.PUT("/form/:id", form.UpdateHandler(form.Update(db)))
+	api.DELETE("/form/:id", form.DeleteHandler(form.Delete(db)))
 
 	api.POST("/upload/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
 	api.DELETE("/delete/:itemid", form.FileDeleteHandler(form.FileDelete(db, minioClient)))

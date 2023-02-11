@@ -116,6 +116,33 @@ func invalidUpdateRequest(req *UpdateRequest) bool {
 	return req.ID == 0
 }
 
+type dateteFunc func(context.Context, uint) error
+
+func (fn dateteFunc) Delete(ctx context.Context, id uint) error {
+	return fn(ctx, id)
+}
+
+func DeleteHandler(svc dateteFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.String(http.StatusBadRequest, fmt.Sprintf("require id : %s", err.Error()))
+		}
+
+		// claims, _ := auth.GetAuthorizedClaims(c)
+		// jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
+		err = svc.Delete(c.Request().Context(), uint(id))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
+		}
+
+		return c.String(http.StatusOK, "success")
+	}
+}
+
 type getCountryFunc func(context.Context, string) (Countrys, error)
 
 func (fn getCountryFunc) GetCountry(ctx context.Context, filter string) (Countrys, error) {

@@ -110,6 +110,7 @@ type Form struct {
 	UpdateBy     string     `gorm:"column:UPDATED_BY"`
 	UpdateDate   *time.Time `gorm:"column:UPDATED_DATE"`
 	Status       int        `gorm:"column:STATE_ID"`
+	DelFlag      string     `gorm:"column:DEL_FLAG"`
 }
 
 func (Form) TableName() string {
@@ -149,6 +150,24 @@ func (req *UpdateRequest) ToModel() Form {
 		Serial:       req.Serial,
 		PeaNo:        req.PeaNo,
 		Status:       req.Status,
+	}
+
+	return form
+}
+
+type deleteForm struct {
+	ID         uint
+	DelFlag    string
+	UpdateBy   string
+	UpdateDate *time.Time
+}
+
+func (df *deleteForm) ToModel() Form {
+	form := Form{
+		ID:         df.ID,
+		UpdateBy:   df.UpdateBy,
+		UpdateDate: df.UpdateDate,
+		DelFlag:    df.DelFlag,
 	}
 
 	return form
