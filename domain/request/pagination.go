@@ -16,7 +16,7 @@ func (p Pagination) GetPage() int {
 }
 
 func (p Pagination) GetLimit() int {
-	if p.Limit <= 0 || p.Limit > LIMIT {
+	if p.Limit <= 0 {
 		return LIMIT
 	}
 	return p.Limit
