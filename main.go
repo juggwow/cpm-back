@@ -138,6 +138,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
 	api.GET("/contract/:id/boq", boq.GetHandler(boq.Get(db)))
+	api.GET("/contract/:id/card", contract.GetNumberOfItemHandler(contract.GetNumberOfItem(db)))
 
 	api.GET("/boq/:id", boq.GetItemByIDHandler(boq.GetItemByID(db)))
 	api.GET("/country", form.GetCountryHandler(form.GetCountry(db)))
