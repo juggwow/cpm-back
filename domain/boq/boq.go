@@ -27,13 +27,16 @@ type ItemResponse struct {
 }
 
 type Item struct {
-	SequencesNo  uint            `gorm:"column:SEQUENCES_NO"`
-	ID           uint            `gorm:"column:ID"`
-	ItemNo       string          `gorm:"column:ITEM"`
-	ItemName     string          `gorm:"column:NAME"`
-	ItemGroup    string          `gorm:"column:GROUPNAME"`
-	ItemQuantity decimal.Decimal `gorm:"column:QUANTITY"`
-	ItemUnit     string          `gorm:"column:UNIT"`
+	SequencesNo          uint            `gorm:"column:SEQUENCES_NO"`
+	ID                   uint            `gorm:"column:ID"`
+	ItemNo               string          `gorm:"column:ITEM"`
+	ItemName             string          `gorm:"column:NAME"`
+	ItemGroup            string          `gorm:"column:GROUPNAME"`
+	ItemQuantity         decimal.Decimal `gorm:"column:QUANTITY"`
+	ItemUnit             string          `gorm:"column:UNIT"`
+	ItemDelivelyQuantity decimal.Decimal `gorm:"column:DELIVERY_QUANTITY"`
+	ItemReceiveQuantity  decimal.Decimal `gorm:"column:RECEIVE_QUANTITY"`
+	ItemDamageQuantity   decimal.Decimal `gorm:"column:DAMAGE_QUANTITY"`
 }
 
 type Items []Item
@@ -73,10 +76,10 @@ func (item *Item) ToResponse() Response {
 		ItemNo:             item.ItemNo,
 		ItemName:           item.ItemName,
 		ItemGroup:          item.ItemGroup,
-		ItemQuantity:       fmt.Sprintf("%v %v", item.ItemQuantity, item.ItemUnit),
-		ItemAmountDelivery: "",
-		ItemAmountGood:     "",
-		ItemAmountBad:      "",
+		ItemQuantity:       checkZero(item.ItemQuantity, item.ItemUnit),
+		ItemAmountDelivery: checkZero(item.ItemDelivelyQuantity, item.ItemUnit),
+		ItemAmountGood:     checkZero(item.ItemReceiveQuantity, item.ItemUnit),
+		ItemAmountBad:      checkZero(item.ItemDamageQuantity, item.ItemUnit),
 	}
 
 	return res
@@ -88,4 +91,11 @@ func (items *Items) ToResponse() []Response {
 		res[i] = item.ToResponse()
 	}
 	return res
+}
+
+func checkZero(value decimal.Decimal, unit string) string {
+	if value.IsZero() {
+		return "-"
+	}
+	return fmt.Sprintf("%v %v", value, unit)
 }

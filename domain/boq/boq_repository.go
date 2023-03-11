@@ -36,7 +36,7 @@ func (spec *ItemSearchSpec) searchBoQItems(db *gorm.DB, id *uint) (Items, int64,
 	// 	return Items, 0, err
 	// }
 
-	subQuery := db.Model(&Items).Select("ROW_NUMBER() OVER(ORDER BY ID ASC) AS SEQUENCES_NO,ID,ITEM,NAME,GROUPNAME,QUANTITY,UNIT").
+	subQuery := db.Model(&Items).Select("ROW_NUMBER() OVER(ORDER BY ID ASC) AS SEQUENCES_NO,ID,ITEM,NAME,GROUPNAME,QUANTITY,UNIT,DELIVERY_QUANTITY,RECEIVE_QUANTITY,DAMAGE_QUANTITY").
 		Where("WORK_CONTRACT_ID = ?", id)
 
 	// findDB := db.Model(&Items)
@@ -76,17 +76,17 @@ func (spec *ItemSearchSpec) buildOrder(db *gorm.DB) *gorm.DB {
 		db.Order("QUANTITY " + spec.SortItemQuantity)
 	}
 
-	// if spec.SortItemDelivery != "" {
-	// 	db.Order("DELIVERY " + spec.SortItemDelivery)
-	// }
+	if spec.SortItemDelivery != "" {
+		db.Order("DELIVERY_QUANTITY " + spec.SortItemDelivery)
+	}
 
-	// if spec.SortItemReceive != "" {
-	// 	db.Order("RECEIVE " + spec.SortItemReceive)
-	// }
+	if spec.SortItemReceive != "" {
+		db.Order("RECEIVE_QUANTITY " + spec.SortItemReceive)
+	}
 
-	// if spec.SortItemDamage != "" {
-	// 	db.Order("DAMAGE " + spec.SortItemDamage)
-	// }
+	if spec.SortItemDamage != "" {
+		db.Order("DAMAGE_QUANTITY " + spec.SortItemDamage)
+	}
 
 	return db
 }
@@ -115,17 +115,17 @@ func (spec *ItemSearchSpec) buildSearch(db *gorm.DB, subQuery *gorm.DB, id *uint
 		db = db.Where("QUANTITY LIKE ?", spec.ItemQuantity+"%")
 	}
 
-	// if spec.ItemDelivery != "" {
-	// 	db = db.Where("DELIVERY LIKE ?", spec.ItemDelivery+"%")
-	// }
+	if spec.ItemDelivery != "" {
+		db = db.Where("DELIVERY_QUANTITY LIKE ?", spec.ItemDelivery+"%")
+	}
 
-	// if spec.ItemReceive != "" {
-	// 	db = db.Where("RECEIVE LIKE ?", spec.ItemReceive+"%")
-	// }
+	if spec.ItemReceive != "" {
+		db = db.Where("RECEIVE_QUANTITY LIKE ?", spec.ItemReceive+"%")
+	}
 
-	// if spec.ItemDamage != "" {
-	// 	db = db.Where("DAMAGE LIKE ?", spec.ItemDamage+"%")
-	// }
+	if spec.ItemDamage != "" {
+		db = db.Where("DAMAGE_QUANTITY LIKE ?", spec.ItemDamage+"%")
+	}
 
 	return db, db.Error
 }
