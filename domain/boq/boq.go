@@ -40,7 +40,7 @@ type Items []Item
 
 type ItemSearchSpec struct {
 	request.Pagination
-	SequencesNo      int
+	SequencesNo      string
 	ItemNo           string
 	ItemName         string
 	ItemGroup        string

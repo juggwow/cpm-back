@@ -50,25 +50,25 @@ func ParseSearchSpec(c echo.Context) ItemSearchSpec {
 	// 	employee = &claims
 	// }
 
-	seqNo, _ := strconv.Atoi(c.QueryParam("seqNo"))
+	// seqNo, _ := strconv.Atoi(c.QueryParam("seqNo"))
 	return ItemSearchSpec{
 		Pagination:       request.GetPagination(page, limit),
-		SequencesNo:      seqNo,
-		ItemNo:           c.QueryParam("num"),
+		SequencesNo:      c.QueryParam("order"),
+		ItemNo:           c.QueryParam("itemNo"),
 		ItemName:         c.QueryParam("name"),
 		ItemGroup:        c.QueryParam("group"),
 		ItemQuantity:     c.QueryParam("quantity"),
 		ItemDelivery:     c.QueryParam("delivery"),
-		ItemReceive:      c.QueryParam("receive"),
-		ItemDamage:       c.QueryParam("damage"),
-		SortSequencesNo:  "",
-		SortItemNo:       "",
-		SortItemName:     "",
-		SortItemGroup:    "",
-		SortItemQuantity: "",
-		SortItemDelivery: "",
-		SortItemReceive:  "",
-		SortItemDamage:   "",
+		ItemReceive:      c.QueryParam("good"),
+		ItemDamage:       c.QueryParam("bad"),
+		SortSequencesNo:  c.QueryParam("sorder"),
+		SortItemNo:       c.QueryParam("sitemNo"),
+		SortItemName:     c.QueryParam("sname"),
+		SortItemGroup:    c.QueryParam("sgroup"),
+		SortItemQuantity: c.QueryParam("squantity"),
+		SortItemDelivery: c.QueryParam("sdelivery"),
+		SortItemReceive:  c.QueryParam("sgood"),
+		SortItemDamage:   c.QueryParam("sbad"),
 	}
 }
 
