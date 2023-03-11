@@ -50,7 +50,6 @@ func InitConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
-	viper.AutomaticEnv()
 	// viper.AllowEmptyEnv(true)
 	// แปลง _ underscore ใน env เป็น . dot notation ใน viper
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
