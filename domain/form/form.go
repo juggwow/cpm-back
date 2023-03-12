@@ -39,7 +39,7 @@ type UpdateRequest struct {
 	Serial       string      `json:"serial"`
 	PeaNo        string      `json:"peano"`
 	Status       int         `json:"status"`
-	File         FilesAttach `json:"file"`
+	File         FilesAttach `json:"filesAttach"`
 }
 
 type Response struct {
@@ -210,7 +210,7 @@ type FileAttach struct {
 	Size string `json:"size"`
 	Unit string `json:"unit"`
 	Path string `json:"filePath"`
-	Type uint   `json:"type"`
+	Type uint   `json:"docType"`
 }
 
 type FilesAttach []FileAttach
