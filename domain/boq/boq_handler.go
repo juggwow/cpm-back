@@ -61,7 +61,7 @@ func ParseSearchSpec(c echo.Context) ItemSearchSpec {
 		ItemDelivery:     c.QueryParam("delivery"),
 		ItemReceive:      c.QueryParam("good"),
 		ItemDamage:       c.QueryParam("bad"),
-		SortSequencesNo:  c.QueryParam("sorder"),
+		SortSequencesNo:  c.QueryParam("ssequencesNo"),
 		SortItemNo:       c.QueryParam("sitemNo"),
 		SortItemName:     c.QueryParam("sname"),
 		SortItemGroup:    c.QueryParam("sgroup"),
