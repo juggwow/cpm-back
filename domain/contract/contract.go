@@ -53,17 +53,17 @@ type CardResponse struct {
 }
 
 type NumberOfItems struct {
-	All           uint `gorm:"column:ALL"`
-	AllComplete   uint `gorm:"column:ALL_COMPLETE"`
-	AllIncomplete uint `gorm:"column:ALL_INCOMPLETE"`
-	Check         uint `gorm:"column:CHECK"`
+	All           uint `gorm:"column:ALL_ITEM"`
+	AllComplete   uint `gorm:"column:COMPLETE"`
+	AllIncomplete uint `gorm:"column:INCOMPLETE"`
+	Check         uint `gorm:"column:ALL_CHECK"`
 	CheckGood     uint `gorm:"column:CHECK_GOOD"`
 	CheckWaste    uint `gorm:"column:CHECK_WASTE"`
 	Progress      uint `gorm:"column:PROGRESS"`
 }
 
 func (NumberOfItems) TableName() string {
-	return "CPM.VIEW_RAD_NUMBER_OF_ITEMS"
+	return "CPM.SUM_NUMBER_OF_ITEMS"
 }
 
 func (n *NumberOfItems) ToResponse() CardResponse {
