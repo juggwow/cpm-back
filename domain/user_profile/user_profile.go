@@ -14,5 +14,5 @@ type UserProfile struct {
 type UserProfiles []UserProfile
 
 func (UserProfile) TableName() string {
-	return "CPM_USER_PROFILE"
+	return "[WDDEVDB\\WORKD].CPM.CPM.CPM_USER_PROFILE"
 }

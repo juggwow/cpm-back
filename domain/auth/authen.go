@@ -12,12 +12,17 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type Role string
+type AuthLog struct {
+	ID         string    `gorm:"column:ID;primarykey"`
+	IP         string    `gorm:"column:IP"`
+	EmployeeID string    `gorm:"column:EMPLOYEE_ID"`
+	LoginAt    time.Time `gorm:"column:LOGIN_AT"`
+	IDToken    string    `gorm:"column:ID_TOKEN"`
+}
 
-const (
-	ADMIN Role = "ADMIN"
-	STAFF Role = "STAFF"
-)
+func (AuthLog) TableName() string {
+	return "CMDC_AUTH_LOG"
+}
 
 type Authenticator struct {
 	provider     *oidc.Provider
@@ -27,14 +32,8 @@ type Authenticator struct {
 }
 
 type JwtEmployeeClaims struct {
-	employeeClaims
-	jwt.StandardClaims
-}
-
-type employeeClaims struct {
 	employee.EmployeeResponse
-	Role  Role   `json:"role"`
-	Token string `json:"token"`
+	jwt.StandardClaims
 }
 
 type keyClockClaims struct {
@@ -59,21 +58,20 @@ type keyClockClaims struct {
 	Email             string `json:"email"`
 }
 
+type refreshTokenResponse struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refreshToken"`
+}
+
 func (a keyClockClaims) toEmployeeClaims(emp employee.EmployeeResponse, token string) JwtEmployeeClaims {
-	exp := time.Now().Add(time.Hour * time.Duration(8)).Unix()
 	return JwtEmployeeClaims{
-		employeeClaims: employeeClaims{
-			Role:             STAFF,
-			EmployeeResponse: emp,
-			Token:            token,
-		},
+		EmployeeResponse: emp,
 		StandardClaims: jwt.StandardClaims{
-			Audience:  a.Aud,
-			ExpiresAt: exp,
-			Id:        xid.New().String(),
-			IssuedAt:  a.Iat,
-			Subject:   emp.EmployeeID,
-			Issuer:    config.AppURL,
+			Audience: a.Aud,
+			Id:       xid.New().String(),
+			IssuedAt: a.Iat,
+			Subject:  emp.EmployeeID,
+			Issuer:   config.AppURL,
 		},
 	}
 }
@@ -84,4 +82,14 @@ func (a keyClockClaims) toEmployee() employee.Employee {
 		FirstName:  a.GivenName,
 		LastName:   a.FamilyName,
 	}
+}
+
+func (claims JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
+	tokenClaims := claims
+	tokenClaims.IssuedAt = time.Now().Unix()
+	tokenClaims.ExpiresAt = time.Now().Add(expiredDuration).Unix()
+	return jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		&tokenClaims,
+	).SignedString([]byte(config.AuthJWTSecret))
 }
