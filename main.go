@@ -2,15 +2,18 @@ package main
 
 import (
 	"context"
+	"cpm-rad-backend/domain/auth"
 	"cpm-rad-backend/domain/boq"
 	"cpm-rad-backend/domain/config"
 	"cpm-rad-backend/domain/connection"
 	"cpm-rad-backend/domain/contract"
+	"cpm-rad-backend/domain/employee"
 	"cpm-rad-backend/domain/form"
 	"cpm-rad-backend/domain/health_check"
 	"cpm-rad-backend/domain/logger"
 	"cpm-rad-backend/domain/minio"
 	"cpm-rad-backend/domain/raddoc"
+	"cpm-rad-backend/domain/report"
 	"net/http"
 	"os"
 	"os/signal"
@@ -120,21 +123,37 @@ func getRoute(zaplog *zap.Logger) *echo.Echo {
 	return e
 }
 
+func getAuthMiddleware() echo.MiddlewareFunc {
+	return middleware.JWTWithConfig(middleware.JWTConfig{
+		Claims:      &auth.JwtEmployeeClaims{},
+		SigningKey:  []byte(config.AuthJWTSecret),
+		TokenLookup: "header:Authorization,cookie:" + config.AuthJWTKey,
+	})
+}
+
 func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.Client) {
 
 	e.GET("/healths", health_check.HealthCheck)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	// if authenticator, err := auth.NewAuthenticator(); err == nil {
-	// 	e.GET("/auth", authenticator.AuthenHandler())
-	// 	e.GET("/auth/callback", authenticator.AuthenCallbackHandler(employee.GetAndCreateIfNotExist(db)))
-	// } else {
-	// 	log.Fatalf("Fatal initiate authenticator: %v\n", err)
-	// 	panic(err)
-	// }
+	if authenticator, err := auth.NewAuthenticator(); err == nil {
+		e.GET("/auth", authenticator.AuthenHandler())
+		e.GET("/auth/callback", authenticator.AuthenCallbackHandler(employee.GetAndCreateIfNotExist(db), auth.CreateLog(db)))
+		e.GET("/auth/refreshToken", authenticator.GetRefreshTokenHandler(auth.GetIDToken(db)), getAuthMiddleware())
+		e.GET("/auth/logout/:token", authenticator.LogoutHandler(auth.GetIDToken(db)))
+
+	} else {
+		log.Fatalf("Fatal initiate authenticator: %v\n", err)
+		panic(err)
+	}
 }
 
 func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.Client) {
+	if config.AuthJWTEnabled {
+		api.Use(getAuthMiddleware())
+	}
+	api.GET("/employees/me", auth.GetCurrentHandler)
+	api.GET("/employees/:employeeId", employee.GetByIDHandler(employee.GetByID(db)))
 
 	api.GET("/contract/:id", contract.GetByIDHandler(contract.GetByID(db)))
 	api.GET("/contract/:id/boq", boq.GetHandler(boq.Get(db)))
@@ -143,7 +162,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.GET("/boq/:id", boq.GetItemByIDHandler(boq.GetItemByID(db)))
 	api.GET("/country", form.GetCountryHandler(form.GetCountry(db)))
 	api.GET("/doctype", form.GetDocTypeHandler(form.GetDocType(db)))
-	api.POST("/form", form.CreateHandler(form.Create(db)))
+	api.POST("/form", report.CreateHandler(report.Create(db, minioClient)))
 	api.GET("/form/:id", form.GetHandler(form.Get(db)))
 	api.PUT("/form/:id", form.UpdateHandler(form.Update(db)))
 	api.DELETE("/form/:id", form.DeleteHandler(form.Delete(db)))

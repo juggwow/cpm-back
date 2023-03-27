@@ -49,12 +49,12 @@ func GetClient() Client {
 }
 
 type Client interface {
-	Upload(ctx context.Context, file *multipart.FileHeader, itemID uint) (*minio.UploadInfo, string, error)
+	Upload(ctx context.Context, file *multipart.FileHeader, floder string) (*minio.UploadInfo, string, error)
 	Delete(ctx context.Context, filename string, itemID uint) error
 	Download(ctx context.Context, filename string) (*minio.Object, string, error)
 }
 
-func (m *client) Upload(ctx context.Context, file *multipart.FileHeader, itemID uint) (*minio.UploadInfo, string, error) {
+func (m *client) Upload(ctx context.Context, file *multipart.FileHeader, floder string) (*minio.UploadInfo, string, error) {
 	src, err := file.Open()
 	if err != nil {
 		return nil, "", err
@@ -65,7 +65,7 @@ func (m *client) Upload(ctx context.Context, file *multipart.FileHeader, itemID 
 
 	info, err := minioClient.PutObject(ctx,
 		config.StorageBucketName,
-		fmt.Sprintf("%d/%s", itemID, objectName),
+		fmt.Sprintf("%s/%s", floder, objectName),
 		src,
 		-1,
 		minio.PutObjectOptions{})
