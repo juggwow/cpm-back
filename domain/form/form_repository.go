@@ -213,7 +213,7 @@ func GetCountry(db *connection.DBConnection) getCountryFunc {
 func FileUpload(db *connection.DBConnection, m minio.Client) fileUploadFunc {
 	return func(ctx context.Context, file *multipart.FileHeader, itemID int) (FileUploadResponse, error) {
 		// var result FileUploadResponse
-		info, objectName, err := m.Upload(ctx, file, uint(itemID))
+		info, objectName, err := m.Upload(ctx, file, string(rune(itemID)))
 
 		b := bytesize.New(float64(info.Size))
 		displaySize := b.Format("%.2f ", "", false)

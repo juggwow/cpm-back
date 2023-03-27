@@ -4,10 +4,12 @@ import (
 	"context"
 	"cpm-rad-backend/domain/logger"
 	"cpm-rad-backend/domain/response"
+	"cpm-rad-backend/domain/utils"
 	"fmt"
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -20,26 +22,70 @@ func (fn createFunc) Create(ctx context.Context, req Request, createdBy string) 
 
 func CreateHandler(svc createFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var req Request
-		log := logger.Unwrap(c)
-		if err := c.Bind(&req); err != nil {
-			log.Error(err.Error())
-			return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+		// log := logger.Unwrap(c)
+
+		req := Request{
+			ItemID:       utils.StringToUint(c.FormValue("itemID")),
+			Arrival:      RadTime(utils.StringToTime(c.FormValue("arrival"))),
+			Inspection:   RadTime(utils.StringToTime(c.FormValue("inspection"))),
+			TaskMaster:   c.FormValue("taskMaster"),
+			Invoice:      c.FormValue("invoice"),
+			Quantity:     utils.StringToUint(c.FormValue("quantity")),
+			Country:      c.FormValue("country"),
+			Manufacturer: c.FormValue("manufacturer"),
+			Model:        c.FormValue("model"),
+			Serial:       c.FormValue("serial"),
+			PeaNo:        c.FormValue("peano"),
+			CreateBy:     c.FormValue("createby"),
+			Status:       utils.StringToInt(c.FormValue("status")),
 		}
 
-		if invalidRequest(&req) {
-			return c.JSON(http.StatusBadRequest, response.Error{Error: fmt.Sprint(req)})
+		docTypes := strings.Split(c.FormValue("docType"), ",")
+
+		form, _ := c.MultipartForm()
+		files := form.File["filesAttach"]
+		// filePaths := []string{}
+		var f FileAttach
+		for i, file := range files {
+			// check file type pdf and size < 50 MB
+			// src, err := file.Open()
+			// if err != nil {
+			// 	return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+			// }
+			// defer src.Close()
+			// res, err := svc.FileUpload(c.Request().Context(), file, itemID)
+			// fus = append(fus, res)
+			// if err != nil {
+			// 	log.Error(err.Error())
+			// 	return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+			// }
+			f.Name = file.Filename
+			f.Size = strconv.FormatInt(file.Size, 10)
+			f.Path = file.Header["Content-Type"][0]
+			f.Type = utils.StringToUint(docTypes[i])
+			req.FilesAttach = append(req.FilesAttach, f)
 		}
 
-		// claims, _ := auth.GetAuthorizedClaims(c)
-		// jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
-		formID, err := svc.Create(c.Request().Context(), req, req.CreateBy)
-		if err != nil {
-			log.Error(err.Error())
-			return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
-		}
+		// var req Request
+		// log := logger.Unwrap(c)
+		// if err := c.Bind(&req); err != nil {
+		// 	log.Error(err.Error())
+		// 	return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+		// }
 
-		return c.JSON(http.StatusCreated, &response.ID{ID: formID})
+		// if invalidRequest(&req) {
+		// 	return c.JSON(http.StatusBadRequest, response.Error{Error: fmt.Sprint(req)})
+		// }
+
+		// // claims, _ := auth.GetAuthorizedClaims(c)
+		// // jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
+		// formID, err := svc.Create(c.Request().Context(), req, req.CreateBy)
+		// if err != nil {
+		// 	log.Error(err.Error())
+		// 	return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
+		// }
+
+		return c.JSON(http.StatusCreated, req)
 	}
 }
 
