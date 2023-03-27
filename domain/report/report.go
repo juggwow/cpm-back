@@ -9,30 +9,30 @@ import (
 )
 
 type Report struct {
-	ID           uint        `json:"ID"`
-	ItemID       string      `json:"itemID"`
-	Arrival      string      `json:"arrival"`
-	Inspection   string      `json:"inspection"`
-	TaskMaster   string      `json:"taskMaster"`
-	Invoice      string      `json:"invoice"`
-	Quantity     string      `json:"quantity"`
-	Country      string      `json:"country"`
-	Manufacturer string      `json:"manufacturer"`
-	Model        string      `json:"model"`
-	Serial       string      `json:"serial"`
-	PeaNo        string      `json:"peano"`
-	CreateBy     string      `json:"createby"`
-	Status       string      `json:"status"`
-	AttachFiles  AttachFiles `json:"filesAttach"`
+	ID           uint                `json:"ID"`
+	ItemID       string              `json:"itemID"`
+	Arrival      string              `json:"arrival"`
+	Inspection   string              `json:"inspection"`
+	TaskMaster   string              `json:"taskMaster"`
+	Invoice      string              `json:"invoice"`
+	Quantity     string              `json:"quantity"`
+	Country      string              `json:"country"`
+	Manufacturer string              `json:"manufacturer"`
+	Model        string              `json:"model"`
+	Serial       string              `json:"serial"`
+	PeaNo        string              `json:"peano"`
+	CreateBy     string              `json:"createby"`
+	Status       string              `json:"status"`
+	AttachFiles  AttachFilesResponse `json:"filesAttach"`
 }
 
 type AttachFile struct {
 	ID          uint   `json:"id"`
 	Name        string `json:"name"`
-	ObjectName  string `json:"objectName"`
+	ObjectName  string
 	DisplaySize string `json:"displaySize"`
-	Size        string `json:"size"`
-	Unit        string `json:"unit"`
+	Size        string
+	Unit        string
 	Path        string `json:"filePath"`
 	FileType    string `json:"fileType"`
 	DocType     uint   `json:"docType"`
@@ -117,4 +117,24 @@ func (f *AttachFile) ToModel(r ReportDB) AttachFileDB {
 	}
 
 	return file
+}
+
+type AttachFileResponse struct {
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	DisplaySize string `json:"displaySize"`
+	FileType    string `json:"fileType"`
+	DocType     uint   `json:"docType"`
+}
+
+type AttachFilesResponse []AttachFileResponse
+
+func (af *AttachFile) ToResponse() AttachFileResponse {
+	return AttachFileResponse{
+		ID:          af.ID,
+		Name:        af.Name,
+		DisplaySize: af.DisplaySize,
+		FileType:    af.FileType,
+		DocType:     af.DocType,
+	}
 }

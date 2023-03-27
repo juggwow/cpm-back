@@ -6,6 +6,7 @@ import (
 	"cpm-rad-backend/domain/minio"
 	"cpm-rad-backend/domain/utils"
 	"fmt"
+	"mime/multipart"
 	"path/filepath"
 	"strings"
 
@@ -25,19 +26,12 @@ func Create(db *connection.DBConnection, m minio.Client) createFunc {
 			report := r.ToModel()
 
 			report.RadNo = fmt.Sprintf("rad-%d", report.ItemID)
-			// now := time.Now()
-			// report.CreatedDate = &now
 			report.CreateBy = "createdBy"
-			// report.UpdatedDate = &now
-			// report.UpdatedBy = createdBy
-
-			// if err := tx.Omit("EmployeeJobs", "JobStatus").Create(&report).Error; err != nil {
-			// 	return err
-			// }
 
 			if err := tx.Omit("UpdateBy", "UpdateDate").Create(&report).Error; err != nil {
 				return err
 			}
+			r.ID = report.ID
 
 			for i, file := range f.Info {
 				src, err := file.Open()
@@ -46,33 +40,18 @@ func Create(db *connection.DBConnection, m minio.Client) createFunc {
 				}
 				defer src.Close()
 
-				info, objectName, err := m.Upload(ctx, file, fmt.Sprintf("%d/%d", report.ItemID, report.ID))
-				if err != nil {
-					return err
+				attachFile, shouldReturn, returnValue := uploadFileToMinio(m, ctx, file, report, f.Type[i])
+				if shouldReturn {
+					return returnValue
 				}
 
-				b := bytesize.New(float64(info.Size))
-				displaySize := b.Format("%.2f ", "", false)
-				words := strings.Fields(displaySize)
-
-				f := AttachFile{
-					ID:          0,
-					Name:        file.Filename,
-					ObjectName:  objectName,
-					DisplaySize: displaySize,
-					Size:        words[0],
-					Unit:        words[1],
-					Path:        info.Key,
-					FileType:    strings.Replace(filepath.Ext(info.Key), ".", "", 1),
-					DocType:     utils.StringToUint(f.Type[i]),
-				}
-
-				r.AttachFiles = append(r.AttachFiles, f)
-				file := f.ToModel(report)
+				file := attachFile.ToModel(report)
 				if err := tx.Create(&file).Error; err != nil {
 					//remove file minio
 					return err
 				}
+				attachFile.ID = file.ID
+				r.AttachFiles = append(r.AttachFiles, attachFile.ToResponse())
 			}
 
 			// if err := updateJobEmployees(tx, formID, &req, createdBy, getEmpByID); err != nil {
@@ -91,4 +70,28 @@ func Create(db *connection.DBConnection, m minio.Client) createFunc {
 
 		return r, err
 	}
+}
+
+func uploadFileToMinio(m minio.Client, ctx context.Context, file *multipart.FileHeader, report ReportDB, docType string) (AttachFile, bool, error) {
+	info, objectName, err := m.Upload(ctx, file, fmt.Sprintf("%d/%d", report.ItemID, report.ID))
+	if err != nil {
+		return AttachFile{}, true, err
+	}
+
+	b := bytesize.New(float64(info.Size))
+	displaySize := b.Format("%.2f ", "", false)
+	words := strings.Fields(displaySize)
+
+	attachFile := AttachFile{
+		ID:          0,
+		Name:        file.Filename,
+		ObjectName:  objectName,
+		DisplaySize: displaySize,
+		Size:        words[0],
+		Unit:        words[1],
+		Path:        info.Key,
+		FileType:    strings.Replace(filepath.Ext(info.Key), ".", "", 1),
+		DocType:     utils.StringToUint(docType),
+	}
+	return attachFile, false, nil
 }

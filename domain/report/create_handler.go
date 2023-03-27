@@ -78,10 +78,9 @@ func invalidRequest(r *Report) error {
 }
 
 func invalidFile(files []*multipart.FileHeader) error {
-	var LIMIT int64
-	LIMIT = 52428800
+	const LIMIT int64 = 52428800
 	for _, file := range files {
-		if ("application/pdf" != file.Header["Content-Type"][0]) && (LIMIT < file.Size) {
+		if (file.Header["Content-Type"][0] != "application/pdf") && (LIMIT < file.Size) {
 			return errors.New(":Invalid File Request")
 		}
 	}
