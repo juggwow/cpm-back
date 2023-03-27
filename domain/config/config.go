@@ -38,7 +38,7 @@ func InitConfig() {
 	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
 	viper.SetDefault("auth.client.id", "CMDC")
 	viper.SetDefault("auth.client.secret", "c31bfd34-5de8-4630-a667-9864c02ae455")
-	viper.SetDefault("auth.jwt.enabled", true)
+	viper.SetDefault("auth.jwt.enabled", false)
 	viper.SetDefault("auth.jwt.key", "rad-token")
 	viper.SetDefault("auth.jwt.secret", "super-secret")
 	viper.SetDefault("auth.state", "state")
