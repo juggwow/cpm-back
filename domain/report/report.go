@@ -67,6 +67,7 @@ func (ReportDB) TableName() string {
 
 func (r *Report) ToModel() ReportDB {
 	return ReportDB{
+		ID:           r.ID,
 		ItemID:       utils.StringToUint(r.ItemID),
 		Arrival:      utils.StringToTime(r.Arrival),
 		Inspection:   utils.StringToTime(r.Inspection),
@@ -83,19 +84,28 @@ func (r *Report) ToModel() ReportDB {
 }
 
 type File struct {
-	Info []*multipart.FileHeader
-	Type []string
+	Info   []*multipart.FileHeader
+	Type   []string
+	Update []UpdateFile
+	Delete []string
+}
+type UpdateFile struct {
+	FileID  uint `json:"id"`
+	DocType uint `json:"docType"`
 }
 
 type AttachFileDB struct {
-	ID       uint            `gorm:"column:ID"`
-	ReportID uint            `gorm:"column:RAD_ID"`
-	DocType  uint            `gorm:"column:RAD_DOC_TYPE_ID"`
-	Name     string          `gorm:"column:FILE_NAME"`
-	Size     decimal.Decimal `gorm:"column:FILE_SIZE"`
-	Unit     string          `gorm:"column:FILE_UNIT"`
-	Path     string          `gorm:"column:FILE_PATH"`
-	CreateBy string          `gorm:"column:CREATED_BY"`
+	ID         uint            `gorm:"column:ID"`
+	ReportID   uint            `gorm:"column:RAD_ID"`
+	DocType    uint            `gorm:"column:RAD_DOC_TYPE_ID"`
+	Name       string          `gorm:"column:FILE_NAME"`
+	Size       decimal.Decimal `gorm:"column:FILE_SIZE"`
+	Unit       string          `gorm:"column:FILE_UNIT"`
+	Path       string          `gorm:"column:FILE_PATH"`
+	CreateBy   string          `gorm:"column:CREATED_BY"`
+	UpdateBy   string          `gorm:"column:UPDATED_BY"`
+	UpdateDate *time.Time      `gorm:"column:UPDATED_DATE"`
+	DelFlag    string          `gorm:"column:DEL_FLAG"`
 }
 
 type AttachFilesDB []AttachFileDB
