@@ -9,6 +9,7 @@ import (
 	"mime/multipart"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/inhies/go-bytesize"
 	"gorm.io/gorm"
@@ -28,7 +29,7 @@ func Create(db *connection.DBConnection, m minio.Client) createFunc {
 			report.RadNo = fmt.Sprintf("rad-%d", report.ItemID)
 			report.CreateBy = "createdBy"
 
-			if err := tx.Omit("UpdateBy", "UpdateDate").Create(&report).Error; err != nil {
+			if err := tx.Omit("UpdateBy", "UpdateDate", "DelFlag").Create(&report).Error; err != nil {
 				return err
 			}
 			r.ID = report.ID
@@ -46,12 +47,95 @@ func Create(db *connection.DBConnection, m minio.Client) createFunc {
 				}
 
 				file := attachFile.ToModel(report)
-				if err := tx.Create(&file).Error; err != nil {
+				if err := tx.Omit("UpdateBy", "UpdateDate", "DelFlag").Create(&file).Error; err != nil {
 					//remove file minio
 					return err
 				}
 				attachFile.ID = file.ID
 				r.AttachFiles = append(r.AttachFiles, attachFile.ToResponse())
+			}
+
+			// if err := updateJobEmployees(tx, formID, &req, createdBy, getEmpByID); err != nil {
+			// 	return err
+			// }
+
+			// deptChangeCode := ""
+			// if err := tx.Model(&employee_job.EmployeeJob{}).Joins("Employee").Joins("EmployeeRole").Where(
+			// 	"CMDC_JOB_ID = ? AND EmployeeRole.ROLE_NAME_ENG = ?", formID, employee_role.SUPERVISOR,
+			// ).Pluck("Employee.DEPT_CHANGE_CODE", &deptChangeCode).Error; err != nil {
+			// 	return err
+			// }
+
+			return nil
+		})
+
+		return r, err
+	}
+}
+
+func Update(db *connection.DBConnection, m minio.Client) updateFunc {
+	return func(ctx context.Context, r Report, f File) (Report, error) {
+
+		// getEmpFromDB := employee.GetByID(db)
+		// getEmpByID := func(empID string) (employee.Employee, error) {
+		// 	return getEmpFromDB(ctx, empID)
+		// }
+
+		err := db.CPM.Transaction(func(tx *gorm.DB) error {
+			report := r.ToModel()
+			report.UpdateBy = "คนแก้ เอกสาร"
+			now := time.Now()
+			report.UpdateDate = &now
+
+			if err := tx.Omit("ItemID", "CreateBy", "DelFlag").Updates(&report).Error; err != nil {
+				return err
+			}
+
+			for i, file := range f.Info {
+				src, err := file.Open()
+				if err != nil {
+					return err
+				}
+				defer src.Close()
+
+				attachFile, shouldReturn, returnValue := uploadFileToMinio(m, ctx, file, report, f.Type[i])
+				if shouldReturn {
+					return returnValue
+				}
+				report.CreateBy = "createdBy"
+				file := attachFile.ToModel(report)
+				if err := tx.Omit("UpdateBy", "UpdateDate", "DelFlag").Create(&file).Error; err != nil {
+					//remove file minio
+					return err
+				}
+				attachFile.ID = file.ID
+				r.AttachFiles = append(r.AttachFiles, attachFile.ToResponse())
+			}
+
+			for _, updateFile := range f.Update {
+				file := AttachFileDB{
+					ID:         updateFile.FileID,
+					DocType:    updateFile.DocType,
+					UpdateBy:   report.UpdateBy,
+					UpdateDate: report.UpdateDate,
+				}
+
+				if err := tx.Select("DocType", "UpdateBy", "UpdateDate").Updates(&file).Error; err != nil {
+					return err
+				}
+			}
+
+			for _, delFile := range f.Delete {
+				file := AttachFileDB{
+					ID:         utils.StringToUint(delFile),
+					UpdateBy:   report.UpdateBy,
+					UpdateDate: report.UpdateDate,
+					DelFlag:    "Y",
+				}
+
+				if err := tx.Select("DelFlag", "UpdateBy", "UpdateDate").Updates(&file).Error; err != nil {
+					return err
+				}
 			}
 
 			// if err := updateJobEmployees(tx, formID, &req, createdBy, getEmpByID); err != nil {
