@@ -173,5 +173,6 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 
 	api.GET("/listofdoc/:itemid", raddoc.GetByItemHandler(raddoc.GetByItem(db)))
 	api.GET("/listofdoc/progress/contract/:id", report.GetProgressReportHandler(report.GetProgressReport(db)))
+	api.GET("/listofdoc/check/contract/:id", report.GetCheckReportHandler(report.GetCheckReport(db)))
 
 }
