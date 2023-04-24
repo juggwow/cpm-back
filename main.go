@@ -167,10 +167,11 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.PUT("/form/:id", report.UpdateHandler(report.Update(db, minioClient)))
 	api.DELETE("/form/:id", form.DeleteHandler(form.Delete(db)))
 
-	api.POST("/upload/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
-	api.DELETE("/delete/:itemid", form.FileDeleteHandler(form.FileDelete(db, minioClient)))
+	// api.POST("/upload/:fieldName/:itemid", form.FileUploadHandler(form.FileUpload(db, minioClient)))
+	// api.DELETE("/delete/:itemid", form.FileDeleteHandler(form.FileDelete(db, minioClient)))
 	api.GET("/download/:fileid", form.FileDownloadHandler(form.FileDownload(db, minioClient)))
 
 	api.GET("/listofdoc/:itemid", raddoc.GetByItemHandler(raddoc.GetByItem(db)))
+	api.GET("/listofdoc/progress/contract/:id", report.GetProgressReportHandler(report.GetProgressReport(db)))
 
 }
