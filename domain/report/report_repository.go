@@ -26,10 +26,10 @@ func Create(db *connection.DBConnection, m minio.Client) createFunc {
 		err := db.CPM.Transaction(func(tx *gorm.DB) error {
 			report := r.ToModel()
 
-			report.RadNo = fmt.Sprintf("rad-%d", report.ItemID)
+			// report.RadNo = fmt.Sprintf("rad-%d", report.ItemID)
 			report.CreateBy = "createdBy"
 
-			if err := tx.Omit("UpdateBy", "UpdateDate", "DelFlag").Create(&report).Error; err != nil {
+			if err := tx.Omit("UpdateBy", "UpdateDate", "DelFlag", "RadNo").Create(&report).Error; err != nil {
 				return err
 			}
 			r.ID = report.ID
