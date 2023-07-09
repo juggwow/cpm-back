@@ -8,6 +8,10 @@ type Error struct {
 	Error string `json:"error"`
 }
 
+type Msg struct {
+	Msg string `json:"msg"`
+}
+
 // type Delete struct {
 // 	Massage string `json:"del" default:"success"`
 // }

@@ -185,7 +185,7 @@ func DeleteHandler(svc dateteFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
 		}
 
-		return c.String(http.StatusOK, "success")
+		return c.JSON(http.StatusOK, response.Msg{Msg: "delete success"})
 	}
 }
 
