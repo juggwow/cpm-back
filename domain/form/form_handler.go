@@ -89,14 +89,6 @@ func CreateHandler(svc createFunc) echo.HandlerFunc {
 	}
 }
 
-func invalidRequest(req *Request) bool {
-	// if req.ItemID == 0 {
-	// 	return true
-	// }
-
-	return req.ItemID == 0
-}
-
 type getFunc func(context.Context, uint) (Response, error)
 
 func (fn getFunc) Get(ctx context.Context, id uint) (Response, error) {
@@ -323,5 +315,31 @@ func FileDownloadHandler(svc fileDownloadFunc) echo.HandlerFunc {
 
 		c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", res.Name))
 		return c.Stream(http.StatusOK, res.Ext, res.Obj)
+	}
+}
+
+type viewFunc func(context.Context, uint) (ResponseView, error)
+
+func (fn viewFunc) View(ctx context.Context, id uint) (ResponseView, error) {
+	return fn(ctx, id)
+}
+
+func GetViewHandler(svc viewFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error()})
+		}
+
+		res, err := svc.View(c.Request().Context(), uint(id))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
+		}
+
+		return c.JSON(http.StatusOK, res)
 	}
 }

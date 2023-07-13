@@ -195,6 +195,107 @@ func Get(db *connection.DBConnection) getFunc {
 	}
 }
 
+func View(db *connection.DBConnection) viewFunc {
+	return func(ctx context.Context, id uint) (ResponseView, error) {
+		var res ResponseView
+
+		var result FormViewDB
+		cpm := db.CPM.Model(&result)
+		err := cpm.Table("CPM.GetReportDetail(?)", id).
+			Scan(&result).
+			Error
+		if err != nil {
+			return res, err
+		}
+
+		var files ViewFilesDB
+		cpm = db.CPM.Model(&files)
+		err = cpm.Table("CPM.GetFileAttachment(?)", result.ID).Order("TYPE_ID").
+			Scan(&files).
+			Error
+		if err != nil {
+			return res, err
+		}
+
+		var attachFiles AttachFiles
+		var viewFiles ViewFiles
+		var temp uint = 0
+		count := len(files)
+		var typeName string
+
+		for i, f := range files {
+			fmt.Println(i)
+			if count == 1 {
+				attachFiles = append(attachFiles, AttachFile{
+					TypeName: f.TypeName,
+					Files: []ViewFile{{
+						ID:   f.ID,
+						Name: f.Name,
+						Size: f.Size,
+						Unit: f.Unit,
+					}},
+				})
+			} else if count-1 == i {
+				if f.TypeID == temp {
+					viewFiles = append(viewFiles, ViewFile{
+						ID:   f.ID,
+						Name: f.Name,
+						Size: f.Size,
+						Unit: f.Unit,
+					})
+					attachFiles = append(attachFiles, AttachFile{
+						TypeName: f.TypeName,
+						Files:    viewFiles,
+					})
+				} else {
+					if len(viewFiles) > 0 {
+						attachFiles = append(attachFiles, AttachFile{
+							TypeName: typeName,
+							Files:    viewFiles,
+						})
+					}
+					attachFiles = append(attachFiles, AttachFile{
+						TypeName: f.TypeName,
+						Files: []ViewFile{{
+							ID:   f.ID,
+							Name: f.Name,
+							Size: f.Size,
+							Unit: f.Unit,
+						}},
+					})
+				}
+			} else {
+				if temp == 0 || f.TypeID == temp {
+					typeName = f.TypeName
+					viewFiles = append(viewFiles, ViewFile{
+						ID:   f.ID,
+						Name: f.Name,
+						Size: f.Size,
+						Unit: f.Unit,
+					})
+				} else {
+					attachFiles = append(attachFiles, AttachFile{
+						TypeName: typeName,
+						Files:    viewFiles,
+					})
+					viewFiles = nil
+					typeName = f.TypeName
+					viewFiles = append(viewFiles, ViewFile{
+						ID:   f.ID,
+						Name: f.Name,
+						Size: f.Size,
+						Unit: f.Unit,
+					})
+				}
+				temp = f.TypeID
+			}
+		}
+
+		res = result.ToResponse(attachFiles)
+		return res, err
+	}
+}
+
 func GetCountry(db *connection.DBConnection) getCountryFunc {
 	return func(ctx context.Context, filter string) (Countrys, error) {
 		var result Countrys

@@ -302,3 +302,84 @@ type FileResponse struct {
 	Ext  string
 	Name string
 }
+
+type AttachFile struct {
+	TypeName string
+	Files    ViewFiles
+}
+type AttachFiles []AttachFile
+
+type FormViewDB struct {
+	ID         uint      `gorm:"column:ID"`
+	ItemID     uint      `gorm:"column:ITEM_ID"`
+	ItemName   string    `gorm:"column:ITEM_NAME"`
+	ItemUnit   string    `gorm:"column:ITEM_UNIT"`
+	RadNo      string    `gorm:"column:RAD_NO"`
+	Arrival    time.Time `gorm:"column:ARRIVAL_DATE_AT_SITE"`
+	Inspection time.Time `gorm:"column:INSPECTION_DATE"`
+	TaskMaster string    `gorm:"column:NAME_OF_TASKMASTER"`
+	Invoice    string    `gorm:"column:CONTRACTOR_INV_NO"`
+	Quantity   uint      `gorm:"column:QUANTITY"`
+	Country    string    `gorm:"column:COUNTRY"`
+	Brand      string    `gorm:"column:MANUFACTURER"`
+	Model      string    `gorm:"column:MODEL"`
+	Serial     string    `gorm:"column:SERIAL_NO"`
+	PeaNo      string    `gorm:"column:PEA_NO"`
+}
+
+type ResponseView struct {
+	ID          uint        `json:"id"`
+	ItemID      uint        `json:"itemID"`
+	ItemName    string      `json:"itemName"`
+	ItemUnit    string      `json:"itemUnit"`
+	Arrival     RadTime     `json:"arrival"`
+	Inspection  RadTime     `json:"inspection"`
+	TaskMaster  string      `json:"taskMaster"`
+	Invoice     string      `json:"invoice"`
+	Qty         uint        `json:"quantity"`
+	Country     string      `json:"country"`
+	Brand       string      `json:"brand"`
+	Model       string      `json:"model"`
+	Serial      string      `json:"serial"`
+	PeaNo       string      `json:"peano"`
+	AttachFiles AttachFiles `json:"attachFiles"`
+}
+
+func (form *FormViewDB) ToResponse(attachFiles AttachFiles) ResponseView {
+	res := ResponseView{
+		ID:          form.ID,
+		ItemID:      form.ItemID,
+		ItemName:    form.ItemName,
+		ItemUnit:    form.ItemUnit,
+		Arrival:     RadTime(form.Arrival),
+		Inspection:  RadTime(form.Inspection),
+		TaskMaster:  form.TaskMaster,
+		Invoice:     form.Invoice,
+		Qty:         form.Quantity,
+		Country:     form.Country,
+		Brand:       form.Brand,
+		Model:       form.Model,
+		Serial:      form.Serial,
+		PeaNo:       form.PeaNo,
+		AttachFiles: attachFiles,
+	}
+	return res
+}
+
+type ViewFileDB struct {
+	ID       uint   `gorm:"column:ID"`
+	TypeID   uint   `gorm:"column:TYPE_ID"`
+	TypeName string `gorm:"column:TYPE_NAME"`
+	Name     string `gorm:"column:FILE_NAME"`
+	Size     string `gorm:"column:FILE_SIZE"`
+	Unit     string `gorm:"column:FILE_UNIT"`
+}
+type ViewFilesDB []ViewFileDB
+
+type ViewFile struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Size string `json:"size"`
+	Unit string `json:"unit"`
+}
+type ViewFiles []ViewFile
