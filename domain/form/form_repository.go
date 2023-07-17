@@ -2,7 +2,6 @@ package form
 
 import (
 	"context"
-	"cpm-rad-backend/domain/boq"
 	"cpm-rad-backend/domain/connection"
 	"cpm-rad-backend/domain/minio"
 	"fmt"
@@ -168,38 +167,8 @@ func Delete(db *connection.DBConnection) dateteFunc {
 func Get(db *connection.DBConnection) getFunc {
 	return func(ctx context.Context, id uint) (Response, error) {
 		var res Response
-		var result Form
 
-		cpm := db.CPM.Model(&result)
-		err := cpm.Where("ID = ?", id).Scan(&result).Error
-		if err != nil {
-			return res, err
-		}
-
-		var item boq.ItemResponse
-		cpm = db.CPM.Model(&item)
-		err = cpm.Where("ID = ?", result.ItemID).Scan(&item).Error
-		if err != nil {
-			return res, err
-		}
-
-		var file Files
-		cpm = db.CPM.Model(&file)
-		err = cpm.Where("RAD_ID = ? AND DEL_FLAG = 'N'", result.ID).Scan(&file).Error
-		if err != nil {
-			return res, err
-		}
-
-		res = result.ToResponse(file, item)
-		return res, err
-	}
-}
-
-func View(db *connection.DBConnection) viewFunc {
-	return func(ctx context.Context, id uint) (ResponseView, error) {
-		var res ResponseView
-
-		var result FormViewDB
+		var result FormDB
 		cpm := db.CPM.Model(&result)
 		err := cpm.Table("CPM.GetReportDetail(?)", id).
 			Scan(&result).
@@ -208,7 +177,7 @@ func View(db *connection.DBConnection) viewFunc {
 			return res, err
 		}
 
-		var files ViewFilesDB
+		var files AttachFiles
 		cpm = db.CPM.Model(&files)
 		err = cpm.Table("CPM.GetFileAttachment(?)", result.ID).Order("TYPE_ID").
 			Scan(&files).
@@ -217,84 +186,111 @@ func View(db *connection.DBConnection) viewFunc {
 			return res, err
 		}
 
-		var attachFiles AttachFiles
-		var viewFiles ViewFiles
-		var temp uint = 0
-		count := len(files)
-		var typeName string
-
-		for i, f := range files {
-			fmt.Println(i)
-			if count == 1 {
-				attachFiles = append(attachFiles, AttachFile{
-					TypeName: f.TypeName,
-					Files: []ViewFile{{
-						ID:   f.ID,
-						Name: f.Name,
-						Size: f.Size,
-						Unit: f.Unit,
-					}},
-				})
-			} else if count-1 == i {
-				if f.TypeID == temp {
-					viewFiles = append(viewFiles, ViewFile{
-						ID:   f.ID,
-						Name: f.Name,
-						Size: f.Size,
-						Unit: f.Unit,
-					})
-					attachFiles = append(attachFiles, AttachFile{
-						TypeName: f.TypeName,
-						Files:    viewFiles,
-					})
-				} else {
-					if len(viewFiles) > 0 {
-						attachFiles = append(attachFiles, AttachFile{
-							TypeName: typeName,
-							Files:    viewFiles,
-						})
-					}
-					attachFiles = append(attachFiles, AttachFile{
-						TypeName: f.TypeName,
-						Files: []ViewFile{{
-							ID:   f.ID,
-							Name: f.Name,
-							Size: f.Size,
-							Unit: f.Unit,
-						}},
-					})
-				}
-			} else {
-				if temp == 0 || f.TypeID == temp {
-					typeName = f.TypeName
-					viewFiles = append(viewFiles, ViewFile{
-						ID:   f.ID,
-						Name: f.Name,
-						Size: f.Size,
-						Unit: f.Unit,
-					})
-				} else {
-					attachFiles = append(attachFiles, AttachFile{
-						TypeName: typeName,
-						Files:    viewFiles,
-					})
-					viewFiles = nil
-					typeName = f.TypeName
-					viewFiles = append(viewFiles, ViewFile{
-						ID:   f.ID,
-						Name: f.Name,
-						Size: f.Size,
-						Unit: f.Unit,
-					})
-				}
-				temp = f.TypeID
-			}
-		}
-
-		res = result.ToResponse(attachFiles)
+		res = result.ToResponse(files)
 		return res, err
 	}
 }
+
+// func View(db *connection.DBConnection) viewFunc {
+// 	return func(ctx context.Context, id uint) (ResponseView, error) {
+// 		var res ResponseView
+
+// 		var result FormViewDB
+// 		cpm := db.CPM.Model(&result)
+// 		err := cpm.Table("CPM.GetReportDetail(?)", id).
+// 			Scan(&result).
+// 			Error
+// 		if err != nil {
+// 			return res, err
+// 		}
+
+// 		var files ViewFilesDB
+// 		cpm = db.CPM.Model(&files)
+// 		err = cpm.Table("CPM.GetFileAttachment(?)", result.ID).Order("TYPE_ID").
+// 			Scan(&files).
+// 			Error
+// 		if err != nil {
+// 			return res, err
+// 		}
+
+// 		var attachFiles AttachFiles
+// 		var viewFiles ViewFiles
+// 		var temp uint = 0
+// 		count := len(files)
+// 		var typeName string
+
+// 		for i, f := range files {
+// 			fmt.Println(i)
+// 			if count == 1 {
+// 				attachFiles = append(attachFiles, AttachFile{
+// 					TypeName: f.TypeName,
+// 					Files: []ViewFile{{
+// 						ID:   f.ID,
+// 						Name: f.Name,
+// 						Size: f.Size,
+// 						Unit: f.Unit,
+// 					}},
+// 				})
+// 			} else if count-1 == i {
+// 				if f.TypeID == temp {
+// 					viewFiles = append(viewFiles, ViewFile{
+// 						ID:   f.ID,
+// 						Name: f.Name,
+// 						Size: f.Size,
+// 						Unit: f.Unit,
+// 					})
+// 					attachFiles = append(attachFiles, AttachFile{
+// 						TypeName: f.TypeName,
+// 						Files:    viewFiles,
+// 					})
+// 				} else {
+// 					if len(viewFiles) > 0 {
+// 						attachFiles = append(attachFiles, AttachFile{
+// 							TypeName: typeName,
+// 							Files:    viewFiles,
+// 						})
+// 					}
+// 					attachFiles = append(attachFiles, AttachFile{
+// 						TypeName: f.TypeName,
+// 						Files: []ViewFile{{
+// 							ID:   f.ID,
+// 							Name: f.Name,
+// 							Size: f.Size,
+// 							Unit: f.Unit,
+// 						}},
+// 					})
+// 				}
+// 			} else {
+// 				if temp == 0 || f.TypeID == temp {
+// 					typeName = f.TypeName
+// 					viewFiles = append(viewFiles, ViewFile{
+// 						ID:   f.ID,
+// 						Name: f.Name,
+// 						Size: f.Size,
+// 						Unit: f.Unit,
+// 					})
+// 				} else {
+// 					attachFiles = append(attachFiles, AttachFile{
+// 						TypeName: typeName,
+// 						Files:    viewFiles,
+// 					})
+// 					viewFiles = nil
+// 					typeName = f.TypeName
+// 					viewFiles = append(viewFiles, ViewFile{
+// 						ID:   f.ID,
+// 						Name: f.Name,
+// 						Size: f.Size,
+// 						Unit: f.Unit,
+// 					})
+// 				}
+// 				temp = f.TypeID
+// 			}
+// 		}
+
+// 		res = result.ToResponse(attachFiles)
+// 		return res, err
+// 	}
+// }
 
 func GetCountry(db *connection.DBConnection) getCountryFunc {
 	return func(ctx context.Context, filter string) (Countrys, error) {

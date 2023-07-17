@@ -42,43 +42,43 @@ type UpdateRequest struct {
 	File         FilesAttach `json:"filesAttach"`
 }
 
-type Response struct {
-	ID           uint            `json:"id"`
-	ItemID       uint            `json:"itemID"`
-	ItemName     string          `json:"itemName"`
-	ItemQty      decimal.Decimal `json:"itemQty"`
-	ItemUnit     string          `json:"itemUnit"`
-	Arrival      RadTime         `json:"arrival"`
-	Inspection   RadTime         `json:"inspection"`
-	TaskMaster   string          `json:"taskMaster"`
-	Invoice      string          `json:"invoice"`
-	Qty          uint            `json:"quantity"`
-	Country      string          `json:"country"`
-	Manufacturer string          `json:"manufacturer"`
-	Model        string          `json:"model"`
-	Serial       string          `json:"serial"`
-	PeaNo        string          `json:"peano"`
-	Files        Files           `json:"filesAttach"`
-}
+// type Response struct {
+// 	ID           uint            `json:"id"`
+// 	ItemID       uint            `json:"itemID"`
+// 	ItemName     string          `json:"itemName"`
+// 	ItemQty      decimal.Decimal `json:"itemQty"`
+// 	ItemUnit     string          `json:"itemUnit"`
+// 	Arrival      RadTime         `json:"arrival"`
+// 	Inspection   RadTime         `json:"inspection"`
+// 	TaskMaster   string          `json:"taskMaster"`
+// 	Invoice      string          `json:"invoice"`
+// 	Qty          uint            `json:"quantity"`
+// 	Country      string          `json:"country"`
+// 	Manufacturer string          `json:"manufacturer"`
+// 	Model        string          `json:"model"`
+// 	Serial       string          `json:"serial"`
+// 	PeaNo        string          `json:"peano"`
+// 	Files        Files           `json:"filesAttach"`
+// }
 
-func (form *Form) ToResponse(file Files, item boq.ItemResponse) Response {
+func (form *Form) ToResponse(files AttachFiles, item boq.ItemResponse) Response {
 	res := Response{
-		ID:           form.ID,
-		ItemID:       form.ItemID,
-		ItemName:     item.ItemName,
-		ItemQty:      item.ItemQuantity,
-		ItemUnit:     item.ItemUnit,
-		Arrival:      RadTime(form.Arrival),
-		Inspection:   RadTime(form.Inspection),
-		TaskMaster:   form.TaskMaster,
-		Invoice:      form.Invoice,
-		Qty:          form.Quantity,
-		Country:      form.Country,
-		Manufacturer: form.Manufacturer,
-		Model:        form.Model,
-		Serial:       form.Serial,
-		PeaNo:        form.PeaNo,
-		Files:        file,
+		ID:          form.ID,
+		ItemID:      form.ItemID,
+		ItemName:    item.ItemName,
+		ItemQty:     item.ItemQuantity,
+		ItemUnit:    item.ItemUnit,
+		Arrival:     RadTime(form.Arrival),
+		Inspection:  RadTime(form.Inspection),
+		TaskMaster:  form.TaskMaster,
+		Invoice:     form.Invoice,
+		Qty:         form.Quantity,
+		Country:     form.Country,
+		Brand:       form.Brand,
+		Model:       form.Model,
+		Serial:      form.Serial,
+		PeaNo:       form.PeaNo,
+		AttachFiles: files,
 	}
 	return res
 }
@@ -94,24 +94,24 @@ type Country struct {
 type Countrys []Country
 
 type Form struct {
-	ID           uint       `gorm:"column:ID"`
-	ItemID       uint       `gorm:"column:BOQ_ID"`
-	RadNo        string     `gorm:"column:RAD_NO"`
-	Arrival      time.Time  `gorm:"column:ARRIVAL_DATE_AT_SITE"`
-	Inspection   time.Time  `gorm:"column:INSPECTION_DATE"`
-	TaskMaster   string     `gorm:"column:NAME_OF_TASKMASTER"`
-	Invoice      string     `gorm:"column:CONTRACTOR_INV_NO"`
-	Quantity     uint       `gorm:"column:QUANTITY"`
-	Country      string     `gorm:"column:COUNTRY"`
-	Manufacturer string     `gorm:"column:MANUFACTURER"`
-	Model        string     `gorm:"column:MODEL"`
-	Serial       string     `gorm:"column:SERIAL_NO"`
-	PeaNo        string     `gorm:"column:PEA_NO"`
-	CreateBy     string     `gorm:"column:CREATED_BY"`
-	UpdateBy     string     `gorm:"column:UPDATED_BY"`
-	UpdateDate   *time.Time `gorm:"column:UPDATED_DATE"`
-	Status       int        `gorm:"column:STATE_ID"`
-	DelFlag      string     `gorm:"column:DEL_FLAG"`
+	ID         uint       `gorm:"column:ID"`
+	ItemID     uint       `gorm:"column:BOQ_ID"`
+	RadNo      string     `gorm:"column:RAD_NO"`
+	Arrival    time.Time  `gorm:"column:ARRIVAL_DATE_AT_SITE"`
+	Inspection time.Time  `gorm:"column:INSPECTION_DATE"`
+	TaskMaster string     `gorm:"column:NAME_OF_TASKMASTER"`
+	Invoice    string     `gorm:"column:CONTRACTOR_INV_NO"`
+	Quantity   uint       `gorm:"column:QUANTITY"`
+	Country    string     `gorm:"column:COUNTRY"`
+	Brand      string     `gorm:"column:MANUFACTURER"`
+	Model      string     `gorm:"column:MODEL"`
+	Serial     string     `gorm:"column:SERIAL_NO"`
+	PeaNo      string     `gorm:"column:PEA_NO"`
+	CreateBy   string     `gorm:"column:CREATED_BY"`
+	UpdateBy   string     `gorm:"column:UPDATED_BY"`
+	UpdateDate *time.Time `gorm:"column:UPDATED_DATE"`
+	Status     int        `gorm:"column:STATE_ID"`
+	DelFlag    string     `gorm:"column:DEL_FLAG"`
 }
 
 func (Form) TableName() string {
@@ -120,18 +120,18 @@ func (Form) TableName() string {
 
 func (req *Request) ToModel() Form {
 	form := Form{
-		ItemID:       req.ItemID,
-		Arrival:      time.Time(req.Arrival),
-		Inspection:   time.Time(req.Inspection),
-		TaskMaster:   req.TaskMaster,
-		Invoice:      req.Invoice,
-		Quantity:     req.Quantity,
-		Country:      req.Country,
-		Manufacturer: req.Manufacturer,
-		Model:        req.Model,
-		Serial:       req.Serial,
-		PeaNo:        req.PeaNo,
-		Status:       req.Status,
+		ItemID:     req.ItemID,
+		Arrival:    time.Time(req.Arrival),
+		Inspection: time.Time(req.Inspection),
+		TaskMaster: req.TaskMaster,
+		Invoice:    req.Invoice,
+		Quantity:   req.Quantity,
+		Country:    req.Country,
+		Brand:      req.Manufacturer,
+		Model:      req.Model,
+		Serial:     req.Serial,
+		PeaNo:      req.PeaNo,
+		Status:     req.Status,
 	}
 
 	return form
@@ -139,18 +139,18 @@ func (req *Request) ToModel() Form {
 
 func (req *UpdateRequest) ToModel() Form {
 	form := Form{
-		ID:           req.ID,
-		Arrival:      time.Time(req.Arrival),
-		Inspection:   time.Time(req.Inspection),
-		TaskMaster:   req.TaskMaster,
-		Invoice:      req.Invoice,
-		Quantity:     req.Quantity,
-		Country:      req.Country,
-		Manufacturer: req.Manufacturer,
-		Model:        req.Model,
-		Serial:       req.Serial,
-		PeaNo:        req.PeaNo,
-		Status:       req.Status,
+		ID:         req.ID,
+		Arrival:    time.Time(req.Arrival),
+		Inspection: time.Time(req.Inspection),
+		TaskMaster: req.TaskMaster,
+		Invoice:    req.Invoice,
+		Quantity:   req.Quantity,
+		Country:    req.Country,
+		Brand:      req.Manufacturer,
+		Model:      req.Model,
+		Serial:     req.Serial,
+		PeaNo:      req.PeaNo,
+		Status:     req.Status,
 	}
 
 	return form
@@ -303,13 +303,88 @@ type FileResponse struct {
 	Name string
 }
 
-type AttachFile struct {
-	TypeName string    `json:"typeName"`
-	Files    ViewFiles `json:"files"`
-}
-type AttachFiles []AttachFile
+// type AttachFile struct {
+// 	TypeName string    `json:"typeName"`
+// 	Files    ViewFiles `json:"files"`
+// }
+// type AttachFiles []AttachFile
 
-type FormViewDB struct {
+// type FormViewDB struct {
+// 	ID         uint      `gorm:"column:ID"`
+// 	ItemID     uint      `gorm:"column:ITEM_ID"`
+// 	ItemName   string    `gorm:"column:ITEM_NAME"`
+// 	ItemUnit   string    `gorm:"column:ITEM_UNIT"`
+// 	RadNo      string    `gorm:"column:RAD_NO"`
+// 	Arrival    time.Time `gorm:"column:ARRIVAL_DATE_AT_SITE"`
+// 	Inspection time.Time `gorm:"column:INSPECTION_DATE"`
+// 	TaskMaster string    `gorm:"column:NAME_OF_TASKMASTER"`
+// 	Invoice    string    `gorm:"column:CONTRACTOR_INV_NO"`
+// 	Quantity   uint      `gorm:"column:QUANTITY"`
+// 	Country    string    `gorm:"column:COUNTRY"`
+// 	Brand      string    `gorm:"column:MANUFACTURER"`
+// 	Model      string    `gorm:"column:MODEL"`
+// 	Serial     string    `gorm:"column:SERIAL_NO"`
+// 	PeaNo      string    `gorm:"column:PEA_NO"`
+// }
+
+// type ResponseView struct {
+// 	ID          uint        `json:"id"`
+// 	ItemID      uint        `json:"itemID"`
+// 	ItemName    string      `json:"itemName"`
+// 	ItemUnit    string      `json:"itemUnit"`
+// 	Arrival     RadTime     `json:"arrival"`
+// 	Inspection  RadTime     `json:"inspection"`
+// 	TaskMaster  string      `json:"taskMaster"`
+// 	Invoice     string      `json:"invoice"`
+// 	Qty         uint        `json:"quantity"`
+// 	Country     string      `json:"country"`
+// 	Brand       string      `json:"brand"`
+// 	Model       string      `json:"model"`
+// 	Serial      string      `json:"serial"`
+// 	PeaNo       string      `json:"peano"`
+// 	AttachFiles AttachFiles `json:"attachFiles"`
+// }
+
+// func (form *FormViewDB) ToResponse(attachFiles AttachFiles) ResponseView {
+// 	res := ResponseView{
+// 		ID:          form.ID,
+// 		ItemID:      form.ItemID,
+// 		ItemName:    form.ItemName,
+// 		ItemUnit:    form.ItemUnit,
+// 		Arrival:     RadTime(form.Arrival),
+// 		Inspection:  RadTime(form.Inspection),
+// 		TaskMaster:  form.TaskMaster,
+// 		Invoice:     form.Invoice,
+// 		Qty:         form.Quantity,
+// 		Country:     form.Country,
+// 		Brand:       form.Brand,
+// 		Model:       form.Model,
+// 		Serial:      form.Serial,
+// 		PeaNo:       form.PeaNo,
+// 		AttachFiles: attachFiles,
+// 	}
+// 	return res
+// }
+
+// type ViewFileDB struct {
+// 	ID       uint   `gorm:"column:ID"`
+// 	TypeID   uint   `gorm:"column:TYPE_ID"`
+// 	TypeName string `gorm:"column:TYPE_NAME"`
+// 	Name     string `gorm:"column:FILE_NAME"`
+// 	Size     string `gorm:"column:FILE_SIZE"`
+// 	Unit     string `gorm:"column:FILE_UNIT"`
+// }
+// type ViewFilesDB []ViewFileDB
+
+// type ViewFile struct {
+// 	ID   uint   `json:"id"`
+// 	Name string `json:"name"`
+// 	Size string `json:"size"`
+// 	Unit string `json:"unit"`
+// }
+// type ViewFiles []ViewFile
+
+type FormDB struct {
 	ID         uint      `gorm:"column:ID"`
 	ItemID     uint      `gorm:"column:ITEM_ID"`
 	ItemName   string    `gorm:"column:ITEM_NAME"`
@@ -327,26 +402,8 @@ type FormViewDB struct {
 	PeaNo      string    `gorm:"column:PEA_NO"`
 }
 
-type ResponseView struct {
-	ID          uint        `json:"id"`
-	ItemID      uint        `json:"itemID"`
-	ItemName    string      `json:"itemName"`
-	ItemUnit    string      `json:"itemUnit"`
-	Arrival     RadTime     `json:"arrival"`
-	Inspection  RadTime     `json:"inspection"`
-	TaskMaster  string      `json:"taskMaster"`
-	Invoice     string      `json:"invoice"`
-	Qty         uint        `json:"quantity"`
-	Country     string      `json:"country"`
-	Brand       string      `json:"brand"`
-	Model       string      `json:"model"`
-	Serial      string      `json:"serial"`
-	PeaNo       string      `json:"peano"`
-	AttachFiles AttachFiles `json:"attachFiles"`
-}
-
-func (form *FormViewDB) ToResponse(attachFiles AttachFiles) ResponseView {
-	res := ResponseView{
+func (form *FormDB) ToResponse(attachFiles AttachFiles) Response {
+	res := Response{
 		ID:          form.ID,
 		ItemID:      form.ItemID,
 		ItemName:    form.ItemName,
@@ -366,20 +423,49 @@ func (form *FormViewDB) ToResponse(attachFiles AttachFiles) ResponseView {
 	return res
 }
 
-type ViewFileDB struct {
-	ID       uint   `gorm:"column:ID"`
-	TypeID   uint   `gorm:"column:TYPE_ID"`
-	TypeName string `gorm:"column:TYPE_NAME"`
-	Name     string `gorm:"column:FILE_NAME"`
-	Size     string `gorm:"column:FILE_SIZE"`
-	Unit     string `gorm:"column:FILE_UNIT"`
-}
-type ViewFilesDB []ViewFileDB
+// type Response struct {
+// 	ID          uint        `json:"id"`
+// 	ItemID      uint        `json:"itemID"`
+// 	ItemName    string      `json:"itemName"`
+// 	ItemUnit    string      `json:"itemUnit"`
+// 	Arrival     RadTime     `json:"arrival"`
+// 	Inspection  RadTime     `json:"inspection"`
+// 	TaskMaster  string      `json:"taskMaster"`
+// 	Invoice     string      `json:"invoice"`
+// 	Qty         uint        `json:"quantity"`
+// 	Country     string      `json:"country"`
+// 	Brand       string      `json:"brand"`
+// 	Model       string      `json:"model"`
+// 	Serial      string      `json:"serial"`
+// 	PeaNo       string      `json:"peano"`
+// 	AttachFiles AttachFiles `json:"attachFiles"`
+// }
 
-type ViewFile struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-	Size string `json:"size"`
-	Unit string `json:"unit"`
+type Response struct {
+	ID          uint            `json:"id"`
+	ItemID      uint            `json:"itemID"`
+	ItemName    string          `json:"itemName"`
+	ItemQty     decimal.Decimal `json:"itemQty"`
+	ItemUnit    string          `json:"itemUnit"`
+	Arrival     RadTime         `json:"arrival"`
+	Inspection  RadTime         `json:"inspection"`
+	TaskMaster  string          `json:"taskMaster"`
+	Invoice     string          `json:"invoice"`
+	Qty         uint            `json:"quantity"`
+	Country     string          `json:"country"`
+	Brand       string          `json:"brand"`
+	Model       string          `json:"model"`
+	Serial      string          `json:"serial"`
+	PeaNo       string          `json:"peano"`
+	AttachFiles AttachFiles     `json:"attachFiles"`
 }
-type ViewFiles []ViewFile
+
+type AttachFile struct {
+	ID       uint   `json:"id" gorm:"column:ID"`
+	Name     string `json:"name" gorm:"column:FILE_NAME"`
+	Size     string `json:"size" gorm:"column:FILE_SIZE"`
+	Unit     string `json:"unit" gorm:"column:FILE_UNIT"`
+	TypeID   string `json:"typeID" gorm:"column:TYPE_ID"`
+	TypeName string `json:"typeName" gorm:"column:TYPE_NAME"`
+}
+type AttachFiles []AttachFile
