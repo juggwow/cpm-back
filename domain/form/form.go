@@ -400,6 +400,7 @@ type FormDB struct {
 	Model      string    `gorm:"column:MODEL"`
 	Serial     string    `gorm:"column:SERIAL_NO"`
 	PeaNo      string    `gorm:"column:PEA_NO"`
+	StateName  string    `gorm:"column:STATE_NAME"`
 }
 
 func (form *FormDB) ToResponse(attachFiles AttachFiles) Response {
@@ -418,6 +419,7 @@ func (form *FormDB) ToResponse(attachFiles AttachFiles) Response {
 		Model:       form.Model,
 		Serial:      form.Serial,
 		PeaNo:       form.PeaNo,
+		StateName:   form.StateName,
 		AttachFiles: attachFiles,
 	}
 	return res
@@ -457,6 +459,7 @@ type Response struct {
 	Model       string          `json:"model"`
 	Serial      string          `json:"serial"`
 	PeaNo       string          `json:"peano"`
+	StateName   string          `json:"stateName"`
 	AttachFiles AttachFiles     `json:"attachFiles"`
 }
 
