@@ -296,7 +296,7 @@ func GetCountry(db *connection.DBConnection) getCountryFunc {
 	return func(ctx context.Context, filter string) (Countrys, error) {
 		var result Countrys
 		cpm := db.CPM.Model(&result)
-		err := cpm.Table("CPM.fGetCountry(?)", filter).
+		err := cpm.Table("CPM.GetCountry(?)", filter).
 			Scan(&result).
 			Error
 		if err != nil {
