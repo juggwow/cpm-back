@@ -4,6 +4,7 @@ import (
 	"context"
 	"cpm-rad-backend/domain/auth"
 	"cpm-rad-backend/domain/boq"
+	"cpm-rad-backend/domain/boqItem"
 	"cpm-rad-backend/domain/config"
 	"cpm-rad-backend/domain/connection"
 	"cpm-rad-backend/domain/contract"
@@ -175,5 +176,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.GET("/listofdoc/:itemid", raddoc.GetByItemHandler(raddoc.GetByItem(db)))
 	api.GET("/listofdoc/progress/contract/:id", report.GetProgressReportHandler(report.GetProgressReport(db)))
 	api.GET("/listofdoc/check/contract/:id", report.GetCheckReportHandler(report.GetCheckReport(db)))
+
+	api.GET("/boq-item/:id", boqItem.GetHandler(boqItem.Get(db)))
 
 }
