@@ -15,6 +15,7 @@ import (
 	"cpm-rad-backend/domain/minio"
 	"cpm-rad-backend/domain/raddoc"
 	"cpm-rad-backend/domain/report"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -48,7 +49,8 @@ func main() {
 	cpmDB, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("can't connect DB : %v", err)
-		panic(err)
+		// panic(err)
+		config.DBCon = config.DBCon + "\nDB : " + fmt.Sprintf("can't connect DB : %v", err)
 	}
 
 	db := &connection.DBConnection{
