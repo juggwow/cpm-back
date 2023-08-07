@@ -58,7 +58,6 @@ func InitConfig() {
 	viper.SetDefault("web.url", "http://localhost:4200/")
 
 	viper.Set("db.con", "")
-	viper.BindEnv("db.con")
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -68,10 +67,11 @@ func InitConfig() {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
 
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
 	// viper.SafeWriteConfig()
-	DBCon = "env : " + fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys()) + viper.GetString("db_con") //viper.GetString("db_con")
+	DBCon = "env : " + fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys()) + fmt.Sprint(viper.Get("db_con"))
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
