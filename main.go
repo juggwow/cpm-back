@@ -137,16 +137,16 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 	e.GET("/healths", health_check.HealthCheck)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	if authenticator, err := auth.NewAuthenticator(); err == nil {
-		e.GET("/auth", authenticator.AuthenHandler())
-		e.GET("/auth/callback", authenticator.AuthenCallbackHandler(employee.GetAndCreateIfNotExist(db), auth.CreateLog(db)))
-		e.GET("/auth/refreshToken", authenticator.GetRefreshTokenHandler(auth.GetIDToken(db)), getAuthMiddleware())
-		e.GET("/auth/logout/:token", authenticator.LogoutHandler(auth.GetIDToken(db)))
+	// if authenticator, err := auth.NewAuthenticator(); err == nil {
+	// 	e.GET("/auth", authenticator.AuthenHandler())
+	// 	e.GET("/auth/callback", authenticator.AuthenCallbackHandler(employee.GetAndCreateIfNotExist(db), auth.CreateLog(db)))
+	// 	e.GET("/auth/refreshToken", authenticator.GetRefreshTokenHandler(auth.GetIDToken(db)), getAuthMiddleware())
+	// 	e.GET("/auth/logout/:token", authenticator.LogoutHandler(auth.GetIDToken(db)))
 
-	} else {
-		log.Fatalf("Fatal initiate authenticator: %v\n", err)
-		panic(err)
-	}
+	// } else {
+	// 	log.Fatalf("Fatal initiate authenticator: %v\n", err)
+	// 	panic(err)
+	// }
 }
 
 func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.Client) {
