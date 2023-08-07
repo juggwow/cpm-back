@@ -82,7 +82,7 @@ func InitConfig() {
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
-	DBCpm = viper.GetString("db.rad")
+	DBCpm = "sqlserver://devpool_rad:" + viper.GetString("db.rad") + "@10.4.34.117:50868?database=RAD"
 
 	StorageSSL = viper.GetBool("storage.ssl")
 	StorageEndpoint = viper.GetString("storage.endpoint")
