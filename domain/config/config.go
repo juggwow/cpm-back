@@ -65,13 +65,14 @@ func InitConfig() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
+		DBCon = fmt.Sprintf("Fatal error config file: %s \n", err)
 	}
 
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	// viper.SafeWriteConfig()
-	DBCon = "env : " + fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys()) + fmt.Sprint(viper.Get("db_con"))
+	// DBCon = "env : " + fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys()) + fmt.Sprint(viper.Get("db_con"))
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
