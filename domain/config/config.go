@@ -57,19 +57,21 @@ func InitConfig() {
 	viper.SetDefault("fe.fileAttachment", "http://localhost:4200/file/")
 	viper.SetDefault("web.url", "http://localhost:4200/")
 
-	viper.Set("db.con", "")
+	// viper.Set("db.con", "")
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	viper.SetConfigFile("./config.yaml")
+
+	// viper.SetConfigName("config")
+	// viper.SetConfigType("yaml")
+	// viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
 		DBCon = fmt.Sprintf("Fatal error config file: %s \n", err)
 	}
-
-	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	// viper.SafeWriteConfig()
 	// DBCon = "env : " + fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys()) + fmt.Sprint(viper.Get("db_con"))
