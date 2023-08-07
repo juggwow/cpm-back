@@ -44,9 +44,6 @@ func InitConfig() {
 
 	viper.SetDefault("storage.ssl", true)
 
-	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -56,9 +53,12 @@ func InitConfig() {
 		// DBCon = fmt.Sprintf("Fatal error config file: %s \n", err)
 	}
 
-	DBCon = "env : " + viper.GetString("db.con")
-	DBCon = DBCon + "\nsecretKey : " + viper.GetString("storage.secretKey") //+ fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys())
-	DBCon = DBCon + "\naccessKey : " + viper.GetString("storage.accessKey")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	DBCon = "env : " + viper.GetString("db.rad")
+	// DBCon = DBCon + "\nsecretKey : " + viper.GetString("storage.secretKey")
+	// DBCon = DBCon + "\naccessKey : " + viper.GetString("storage.accessKey")
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
