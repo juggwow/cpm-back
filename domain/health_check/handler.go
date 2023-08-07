@@ -1,7 +1,6 @@
 package health_check
 
 import (
-	"cpm-rad-backend/domain/config"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -15,5 +14,5 @@ import (
 // @Success 200 {string} ok
 // @Router /healths [get]
 func HealthCheck(c echo.Context) error {
-	return c.String(http.StatusOK, config.DBCon)
+	return c.String(http.StatusOK, "OK")
 }

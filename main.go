@@ -48,7 +48,7 @@ func main() {
 	cpmDB, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("can't connect DB : %v", err)
-		// panic(err)
+		panic(err)
 	}
 
 	db := &connection.DBConnection{
@@ -94,7 +94,7 @@ func initMinio() minio.Client {
 	}
 	if err := minio.NewConnection(conf); err != nil {
 		log.Fatalf("can't connect MINIO client: %v", err)
-		// panic(err)
+		panic(err)
 	}
 
 	minioClient := minio.GetClient()
@@ -145,7 +145,7 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 
 	} else {
 		log.Fatalf("Fatal initiate authenticator: %v\n", err)
-		// panic(err)
+		panic(err)
 	}
 }
 

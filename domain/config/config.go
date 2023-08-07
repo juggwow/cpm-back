@@ -35,27 +35,14 @@ func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
 
-	// viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
+	viper.SetDefault("web.url", "http://localhost:4200/")
+	viper.SetDefault("web.fileAttachment.url", "http://localhost:4200/file/")
 
 	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
-	viper.SetDefault("auth.client.id", "CMDC")
-	viper.SetDefault("auth.client.secret", "c31bfd34-5de8-4630-a667-9864c02ae455")
-	viper.SetDefault("auth.jwt.enabled", false)
-	viper.SetDefault("auth.jwt.key", "rad-token")
-	viper.SetDefault("auth.jwt.secret", "super-secret")
-	viper.SetDefault("auth.state", "state")
-	viper.SetDefault("auth.url", "https://sso.pea.co.th/auth/realms/idm")
+
+	viper.SetDefault("auth.jwt.enabled", true)
 
 	viper.SetDefault("storage.ssl", true)
-	viper.SetDefault("storage.endpoint", "minio-api-kolpos.pea.co.th")
-	viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
-	viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
-	viper.SetDefault("storage.bucketName", "devpool-rad")
-
-	viper.SetDefault("dito.endpoint", "http://172.30.211.224:42/api/pdf-producer/")
-
-	viper.SetDefault("fe.fileAttachment", "http://localhost:4200/file/")
-	viper.SetDefault("web.url", "http://localhost:4200/")
 
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -69,15 +56,14 @@ func InitConfig() {
 		// DBCon = fmt.Sprintf("Fatal error config file: %s \n", err)
 	}
 
-	// viper.SafeWriteConfig()
 	DBCon = "env : " + viper.GetString("db.con")
 	DBCon = DBCon + "\nsecretKey : " + viper.GetString("storage.secretKey") //+ fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys())
 	DBCon = DBCon + "\naccessKey : " + viper.GetString("storage.accessKey")
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
-	// DBCpm = viper.GetString("db.rad")
-	DBCpm = viper.GetString("db.con")
+
+	DBCpm = viper.GetString("db.rad")
 
 	StorageSSL = viper.GetBool("storage.ssl")
 	StorageEndpoint = viper.GetString("storage.endpoint")
@@ -92,7 +78,7 @@ func InitConfig() {
 	AuthJWTKey = viper.GetString("auth.jwt.key")
 	AuthJWTSecret = viper.GetString("auth.jwt.secret")
 	AuthURL = viper.GetString("auth.url")
-	// DBCpm = fmt.Sprintf("%#v", viper.AllKeys())
+
 	DitoApi = viper.GetString("dito.endpoint")
 
 }
