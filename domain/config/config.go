@@ -29,6 +29,7 @@ var StorageAccessKey string
 var StorageSecretKey string
 var StorageBucketName string
 var DitoApi string
+var DBPass string
 
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
@@ -82,7 +83,8 @@ func InitConfig() {
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
-	DBCpm = "sqlserver://devpool_rad:" + viper.GetString("db.rad") + "@10.4.34.117:50868?database=RAD"
+	DBPass = viper.GetString("db.rad")
+	DBCpm = "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD"
 
 	StorageSSL = viper.GetBool("storage.ssl")
 	StorageEndpoint = viper.GetString("storage.endpoint")
