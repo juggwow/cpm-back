@@ -29,7 +29,6 @@ var StorageAccessKey string
 var StorageSecretKey string
 var StorageBucketName string
 var DitoApi string
-var DBPass string
 
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
@@ -57,41 +56,27 @@ func InitConfig() {
 	viper.SetDefault("fe.fileAttachment", "http://localhost:4200/file/")
 	viper.SetDefault("web.url", "http://localhost:4200/")
 
-	// // set config file
-	// viper.SetConfigName("config")
-	// viper.SetConfigType("yaml")
-	// viper.AddConfigPath(".")
-	// // viper.AllowEmptyEnv(true)
-	// // แปลง _ underscore ใน env เป็น . dot notation ใน viper
-	// viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-
-	// err := viper.ReadInConfig()
-	// if err != nil {
-	// 	zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
-	// }
-
+	// set config file
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
+	// viper.AllowEmptyEnv(true)
+	// แปลง _ underscore ใน env เป็น . dot notation ใน viper
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
 
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	// viper.AutomaticEnv()
-
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
-	DBPass = viper.GetString("db.rad")
-	DBCpm = "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD"
+	DBCpm = viper.GetString("db.rad")
 
 	StorageSSL = viper.GetBool("storage.ssl")
 	StorageEndpoint = viper.GetString("storage.endpoint")
 	StorageAccessKey = viper.GetString("storage.accessKey")
 	StorageSecretKey = viper.GetString("storage.secretKey")
-	// StorageAccessKey = "RhoF4o6NbIHzyiei"
-	// StorageSecretKey = "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc"
 	StorageBucketName = viper.GetString("storage.bucketName")
 
 	AuthCallbackURL = viper.GetString("auth.callback.url")
