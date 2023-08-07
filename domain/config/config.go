@@ -40,7 +40,7 @@ func InitConfig() {
 
 	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
 
-	viper.SetDefault("auth.jwt.enabled", true)
+	viper.SetDefault("auth.jwt.enabled", false)
 
 	viper.SetDefault("storage.ssl", true)
 
@@ -56,7 +56,7 @@ func InitConfig() {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	DBCon = "env : " + viper.GetString("db.rad")
+	// DBCon = "env : " + viper.GetString("db.rad")
 	// DBCon = DBCon + "\nsecretKey : " + viper.GetString("storage.secretKey")
 	// DBCon = DBCon + "\naccessKey : " + viper.GetString("storage.accessKey")
 

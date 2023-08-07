@@ -96,7 +96,8 @@ func initMinio() minio.Client {
 	}
 	if err := minio.NewConnection(conf); err != nil {
 		log.Fatalf("can't connect MINIO client: %v", err)
-		panic(err)
+		// panic(err)
+		config.DBCon = config.DBCon + "\nMinio : " + fmt.Sprintf("can't connect MINIO client : %v", err)
 	}
 
 	minioClient := minio.GetClient()
@@ -147,7 +148,8 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 
 	} else {
 		log.Fatalf("Fatal initiate authenticator: %v\n", err)
-		panic(err)
+		// panic(err)
+		config.DBCon = config.DBCon + "\nAuth : " + fmt.Sprintf("Fatal initiate authenticator: %v", err)
 	}
 }
 
