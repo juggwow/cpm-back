@@ -28,6 +28,7 @@ var StorageEndpoint string
 var StorageAccessKey string
 var StorageSecretKey string
 var StorageBucketName string
+var DitoApi string
 
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
@@ -49,6 +50,11 @@ func InitConfig() {
 	viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
 	viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
 	viper.SetDefault("storage.bucketName", "devpool-rad")
+
+	viper.SetDefault("dito.endpoint", "http://172.30.211.224:42/api/pdf-producer/")
+
+	viper.SetDefault("fe.fileAttachment", "http://localhost:4200/file/")
+	viper.SetDefault("web.url", "http://localhost:4200/")
 
 	// set config file
 	viper.SetConfigName("config")
@@ -81,5 +87,6 @@ func InitConfig() {
 	AuthJWTSecret = viper.GetString("auth.jwt.secret")
 	AuthURL = viper.GetString("auth.url")
 	// DBCpm = fmt.Sprintf("%#v", viper.AllKeys())
+	DitoApi = viper.GetString("dito.endpoint")
 
 }
