@@ -33,8 +33,8 @@ var DitoApi string
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
-	// set default variable
-	viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
+
+	// viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
 
 	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
 	viper.SetDefault("auth.client.id", "CMDC")
@@ -56,18 +56,17 @@ func InitConfig() {
 	viper.SetDefault("fe.fileAttachment", "http://localhost:4200/file/")
 	viper.SetDefault("web.url", "http://localhost:4200/")
 
-	// set config file
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
-	// viper.AllowEmptyEnv(true)
-	// แปลง _ underscore ใน env เป็น . dot notation ใน viper
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-
 	err := viper.ReadInConfig()
 	if err != nil {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
+	// viper.SafeWriteConfig()
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
