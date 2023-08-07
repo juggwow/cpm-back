@@ -9,4 +9,3 @@ commonLabels:
 patchesStrategicMerge:
   - configmap.yaml
   - patch.yaml
-  - secret.yaml
