@@ -75,7 +75,8 @@ func InitConfig() {
 
 	// viper.SafeWriteConfig()
 	DBCon = "env : " + viper.GetString("db.con")
-	DBCon = DBCon + "\nenv : " + fmt.Sprint(viper.Get("app.co")) //+ fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys())
+	DBCon = DBCon + "\nsecretKey : " + viper.GetString("storage.secretKey") //+ fmt.Sprint(viper.AllSettings()) + fmt.Sprint(viper.AllKeys())
+	DBCon = DBCon + "\naccessKey : " + viper.GetString("storage.accessKey")
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
