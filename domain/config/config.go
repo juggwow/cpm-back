@@ -35,22 +35,22 @@ func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
 	// set default variable
-	// viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
+	viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
 
-	// viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
-	// viper.SetDefault("auth.client.id", "CMDC")
-	// viper.SetDefault("auth.client.secret", "c31bfd34-5de8-4630-a667-9864c02ae455")
-	// viper.SetDefault("auth.jwt.enabled", false)
-	// viper.SetDefault("auth.jwt.key", "rad-token")
-	// viper.SetDefault("auth.jwt.secret", "super-secret")
-	// viper.SetDefault("auth.state", "state")
-	// viper.SetDefault("auth.url", "https://sso.pea.co.th/auth/realms/idm")
+	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
+	viper.SetDefault("auth.client.id", "CMDC")
+	viper.SetDefault("auth.client.secret", "c31bfd34-5de8-4630-a667-9864c02ae455")
+	viper.SetDefault("auth.jwt.enabled", false)
+	viper.SetDefault("auth.jwt.key", "rad-token")
+	viper.SetDefault("auth.jwt.secret", "super-secret")
+	viper.SetDefault("auth.state", "state")
+	viper.SetDefault("auth.url", "https://sso.pea.co.th/auth/realms/idm")
 
-	// viper.SetDefault("storage.ssl", true)
-	// viper.SetDefault("storage.endpoint", "minio-api-kolpos.pea.co.th")
-	// viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
-	// viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
-	// viper.SetDefault("storage.bucketName", "devpool-rad")
+	viper.SetDefault("storage.ssl", true)
+	viper.SetDefault("storage.endpoint", "minio-api-kolpos.pea.co.th")
+	viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
+	viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
+	viper.SetDefault("storage.bucketName", "devpool-rad")
 
 	viper.SetDefault("dito.endpoint", "http://172.30.211.224:42/api/pdf-producer/")
 
@@ -79,7 +79,7 @@ func InitConfig() {
 	}
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.AutomaticEnv()
+	// viper.AutomaticEnv()
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
@@ -88,10 +88,10 @@ func InitConfig() {
 
 	StorageSSL = viper.GetBool("storage.ssl")
 	StorageEndpoint = viper.GetString("storage.endpoint")
-	// StorageAccessKey = viper.GetString("storage.accessKey")
-	// StorageSecretKey = viper.GetString("storage.secretKey")
-	StorageAccessKey = "RhoF4o6NbIHzyiei"
-	StorageSecretKey = "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc"
+	StorageAccessKey = viper.GetString("storage.accessKey")
+	StorageSecretKey = viper.GetString("storage.secretKey")
+	// StorageAccessKey = "RhoF4o6NbIHzyiei"
+	// StorageSecretKey = "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc"
 	StorageBucketName = viper.GetString("storage.bucketName")
 
 	AuthCallbackURL = viper.GetString("auth.callback.url")
