@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: ${app_name}-config
 data:
-  DB_RAD: $DB_RAD_DEV
+  DB_CON: $DB_RAD_DEV

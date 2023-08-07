@@ -29,6 +29,7 @@ var StorageAccessKey string
 var StorageSecretKey string
 var StorageBucketName string
 var DitoApi string
+var DBCon string
 
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
@@ -67,6 +68,8 @@ func InitConfig() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 	// viper.SafeWriteConfig()
+
+	DBCon = viper.GetString("db.con")
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")

@@ -15,5 +15,5 @@ import (
 // @Success 200 {string} ok
 // @Router /healths [get]
 func HealthCheck(c echo.Context) error {
-	return c.String(http.StatusOK, config.DBCpm)
+	return c.String(http.StatusOK, config.DBCon)
 }
