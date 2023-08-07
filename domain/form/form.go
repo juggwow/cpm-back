@@ -303,6 +303,12 @@ type FileResponse struct {
 	Name string
 }
 
+type AttachFile struct {
+	TypeName string
+	Files    ViewFiles
+}
+type AttachFiles []AttachFile
+
 // type AttachFile struct {
 // 	TypeName string    `json:"typeName"`
 // 	Files    ViewFiles `json:"files"`
