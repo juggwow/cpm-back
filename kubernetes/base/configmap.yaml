@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${app_name}-config
+data:
+  APP_URL: ""
+  AUTH_CALLBACK_URL: ""
+  AUTH_CLIENT_ID: ""
+  AUTH_JWT_ENABLED: ""
+  AUTH_URL: ""
+  STORAGE_BUCKETNAME: ""
+  STORAGE_ENDPOINT: ""
+  STORAGE_SSL: ""
