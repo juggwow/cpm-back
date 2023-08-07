@@ -68,8 +68,8 @@ func InitConfig() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 	// viper.SafeWriteConfig()
-
-	DBCon = viper.GetString("db.con")
+	viper.AllSettings()
+	DBCon = "env : " + fmt.Sprint(viper.AllSettings()) //viper.GetString("db_con")
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
