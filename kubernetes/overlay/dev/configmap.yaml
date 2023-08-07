@@ -1,6 +1,6 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ${app_name}-config-dev
+  name: ${app_name}-config
 data:
   DB_CON: $DB_RAD_DEV
