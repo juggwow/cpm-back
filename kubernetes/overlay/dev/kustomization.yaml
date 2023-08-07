@@ -7,5 +7,6 @@ nameSuffix: -dev
 commonLabels:
   app: ${app_name}-dev
 patchesStrategicMerge:
+  - configmap.yaml
   - patch.yaml
   - secret.yaml

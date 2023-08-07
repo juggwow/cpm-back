@@ -1,6 +1,7 @@
 resources:
   - manifest.yaml
   - secret.yaml
+  - configmap.yaml
 vars:
   - name: ING_NAME
     objref:
