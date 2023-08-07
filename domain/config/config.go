@@ -46,10 +46,10 @@ func InitConfig() {
 	viper.SetDefault("auth.url", "https://sso.pea.co.th/auth/realms/idm")
 
 	viper.SetDefault("storage.ssl", true)
-	viper.SetDefault("storage.endpoint", "minio-api-kolpos.pea.co.th")
-	viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
-	viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
-	viper.SetDefault("storage.bucketName", "devpool-rad")
+	// viper.SetDefault("storage.endpoint", "minio-api-kolpos.pea.co.th")
+	// viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
+	// viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
+	// viper.SetDefault("storage.bucketName", "devpool-rad")
 
 	viper.SetDefault("dito.endpoint", "http://172.30.211.224:42/api/pdf-producer/")
 
