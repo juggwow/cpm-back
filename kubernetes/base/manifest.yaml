@@ -21,6 +21,8 @@ spec:
             - containerPort: 8000
               protocol: TCP
           envFrom:
+            - configMapRef:
+                name: ${app_name}-config
             - secretRef:
                 name: ${app_name}-secret
           resources:
