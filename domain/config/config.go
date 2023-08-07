@@ -35,7 +35,7 @@ func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
 
-	viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
+	// viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
 
 	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
 	viper.SetDefault("auth.client.id", "CMDC")
@@ -79,7 +79,8 @@ func InitConfig() {
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
-	DBCpm = viper.GetString("db.rad")
+	// DBCpm = viper.GetString("db.rad")
+	DBCpm = viper.GetString("db.con")
 
 	StorageSSL = viper.GetBool("storage.ssl")
 	StorageEndpoint = viper.GetString("storage.endpoint")
