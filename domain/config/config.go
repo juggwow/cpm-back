@@ -40,7 +40,7 @@ func InitConfig() {
 	viper.SetDefault("app.port", "8000")
 
 	viper.SetDefault("web.url", "http://localhost:4200")
-	viper.SetDefault("web.loadFile.url", "http://localhost:4200/pdf/")
+	viper.SetDefault("web.loadFile.url", "http://localhost:4200/file/")
 	// viper.SetDefault("web.fileAttachment.url", "http://localhost:4200/pdf/file")
 
 	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
