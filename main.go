@@ -169,7 +169,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.GET("/doctype", form.GetDocTypeHandler(form.GetDocType(db)))
 
 	api.GET("/report/:id", report.GetHandler(report.Get(db)))
-	api.POST("/form", report.CreateHandler(report.Create(db, minioClient)))
+	api.POST("/report", report.CreateHandler(report.Create(db, minioClient)))
 	api.GET("/form/:id", form.GetHandler(form.Get(db)))
 	// api.GET("/form/view/:id", form.GetViewHandler(form.View(db)))
 	// api.PUT("/form/:id", report.UpdateHandler(report.Update(db, minioClient)))
