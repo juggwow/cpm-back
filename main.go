@@ -170,6 +170,8 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 
 	api.GET("/report/:id", report.GetHandler(report.Get(db)))
 	api.POST("/report", report.CreateHandler(report.Create(db, minioClient)))
+	api.GET("/report/:id/pdf", report.GenPdfHandler(report.GenPdf(db)))
+
 	api.GET("/form/:id", form.GetHandler(form.Get(db)))
 	// api.GET("/form/view/:id", form.GetViewHandler(form.View(db)))
 	// api.PUT("/form/:id", report.UpdateHandler(report.Update(db, minioClient)))
