@@ -54,7 +54,7 @@ func (f *FileAttachmentDB) ToResponse() FileAttachment {
 	return FileAttachment{
 		Type: f.Type,
 		Name: f.Name,
-		Link: config.FileAttachmentURL + fmt.Sprint(f.ID),
+		Link: config.WebLoadFileURL + fmt.Sprint(f.ID),
 	}
 }
 

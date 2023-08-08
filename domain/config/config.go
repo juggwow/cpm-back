@@ -10,6 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
+var WebURL string
+var WebLoadFileURL string
 var AppURL string
 var AppPort string
 var DBCpm string
@@ -31,12 +33,15 @@ var StorageBucketName string
 var DitoApi string
 var DBCon string
 
+// var FileAttachmentURL string
+
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
 
-	viper.SetDefault("web.url", "http://localhost:4200/")
-	viper.SetDefault("web.fileAttachment.url", "http://localhost:4200/file/")
+	viper.SetDefault("web.url", "http://localhost:4200")
+	viper.SetDefault("web.loadFile.url", "http://localhost:4200/file/")
+	// viper.SetDefault("web.fileAttachment.url", "http://localhost:4200/pdf/file")
 
 	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
 
@@ -63,6 +68,9 @@ func InitConfig() {
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
 
+	WebURL = viper.GetString("web.url")
+	WebLoadFileURL = viper.GetString("web.loadFile.url")
+
 	DBCpm = viper.GetString("db.rad")
 
 	StorageSSL = viper.GetBool("storage.ssl")
@@ -80,5 +88,7 @@ func InitConfig() {
 	AuthURL = viper.GetString("auth.url")
 
 	DitoApi = viper.GetString("dito.endpoint")
+
+	// FileAttachmentURL = viper.GetString("web.fileAttachment.url")
 
 }
