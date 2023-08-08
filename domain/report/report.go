@@ -240,3 +240,9 @@ func (r *ReportDB) ToResponse(attachFiles ResponseAttachFiles) ResponseReportDet
 	}
 	return res
 }
+
+type FileResponse struct {
+	Obj  []byte
+	Ext  string
+	Name string
+}
