@@ -6,6 +6,7 @@ import (
 	"cpm-rad-backend/domain/response"
 	"cpm-rad-backend/domain/utils"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -314,9 +315,21 @@ func FileDownloadHandler(svc fileDownloadFunc) echo.HandlerFunc {
 		}
 
 		c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", res.Name))
-		return c.Stream(http.StatusOK, res.Ext, res.Obj)
+		// return c.Stream(http.StatusOK, res.Ext, res.Obj)
+		body, err := io.ReadAll(res.Obj)
+		if err != nil {
+			fmt.Println(err.Error())
+			// return nil, err
+		}
+		return c.Blob(http.StatusOK, res.Ext, body)
 	}
 }
+
+// func StreamToByte(stream io.Reader) []byte {
+// 	buf := new(bytes.Buffer)
+// 	buf.ReadFrom(stream)
+// 	return buf.Bytes()
+// }
 
 // type viewFunc func(context.Context, uint) (ResponseView, error)
 
