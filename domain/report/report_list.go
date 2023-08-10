@@ -7,13 +7,14 @@ import (
 )
 
 type ProgressReport struct {
-	Seq            int        `json:"seq"`
-	ID             int        `json:"id"`
+	Seq            uint       `json:"seq"`
+	ID             uint       `json:"id"`
 	InvoidNo       string     `json:"invNo"`
-	BoqItemName    string     `json:"itemName"`
+	ItemID         uint       `json:"itemID"`
+	ItemName       string     `json:"itemName"`
 	ArrivalDate    utils.Time `json:"arrival"`
 	InspectionDate utils.Time `json:"inspection"`
-	StateID        int        `json:"stateID"`
+	StateID        uint       `json:"stateID"`
 	StateName      string     `json:"stateName"`
 }
 type ProgressReports []ProgressReport
@@ -54,13 +55,14 @@ type ProgressReportSearch struct {
 
 func (p *ProgressReportDB) ToResponse() ProgressReport {
 	return ProgressReport{
-		Seq:            int(p.SequencesNo),
-		ID:             int(p.ID),
+		Seq:            p.SequencesNo,
+		ID:             p.ID,
 		InvoidNo:       p.Invoice,
-		BoqItemName:    p.ItemName,
+		ItemID:         p.ItemID,
+		ItemName:       p.ItemName,
 		ArrivalDate:    p.Arrival,
 		InspectionDate: p.Inspection,
-		StateID:        int(p.StateID),
+		StateID:        p.StateID,
 		StateName:      p.StateName,
 	}
 }
