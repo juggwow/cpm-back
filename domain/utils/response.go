@@ -7,3 +7,9 @@ type ReaponseError struct {
 type ReaponseID struct {
 	ID uint `json:"id"`
 }
+
+type Reaponse struct {
+	Error string `json:"error,omitempty"`
+	Msg   string `json:"msg,omitempty"`
+	ID    uint   `json:"id,omitempty"`
+}

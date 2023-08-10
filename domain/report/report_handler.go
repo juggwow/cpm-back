@@ -4,6 +4,7 @@ import (
 	"context"
 	"cpm-rad-backend/domain/logger"
 	"cpm-rad-backend/domain/utils"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -25,7 +26,19 @@ func CreateHandler(svc createFunc) echo.HandlerFunc {
 		log := logger.Unwrap(c)
 
 		var r RequestReportCreate
-		bind(c, &r)
+		r.ItemID = c.FormValue("itemID")
+		r.Arrival = c.FormValue("arrival")
+		r.Inspection = c.FormValue("inspection")
+		r.TaskMaster = c.FormValue("taskMaster")
+		r.Invoice = c.FormValue("invoice")
+		r.Quantity = c.FormValue("quantity")
+		r.Country = c.FormValue("country")
+		r.Brand = c.FormValue("brand")
+		r.Model = c.FormValue("model")
+		r.Serial = c.FormValue("serial")
+		r.PeaNo = c.FormValue("peano")
+		r.CreateBy = c.FormValue("createby")
+		r.Status = c.FormValue("status")
 
 		if err := invalidRequest(&r); err != nil {
 			log.Error(err.Error())
@@ -51,24 +64,6 @@ func CreateHandler(svc createFunc) echo.HandlerFunc {
 		}
 		return c.JSON(http.StatusCreated, res)
 	}
-}
-
-func bind(c echo.Context, r *RequestReportCreate) {
-
-	r.ItemID = c.FormValue("itemID")
-	r.Arrival = c.FormValue("arrival")
-	r.Inspection = c.FormValue("inspection")
-	r.TaskMaster = c.FormValue("taskMaster")
-	r.Invoice = c.FormValue("invoice")
-	r.Quantity = c.FormValue("quantity")
-	r.Country = c.FormValue("country")
-	r.Brand = c.FormValue("brand")
-	r.Model = c.FormValue("model")
-	r.Serial = c.FormValue("serial")
-	r.PeaNo = c.FormValue("peano")
-	r.CreateBy = c.FormValue("createby")
-	r.Status = c.FormValue("status")
-
 }
 
 type getFunc func(context.Context, uint) (ResponseReportDetail, error)
@@ -97,69 +92,87 @@ func GetHandler(svc getFunc) echo.HandlerFunc {
 	}
 }
 
-// type updateFunc func(context.Context, Report, File) (Report, error)
+type updateFunc func(context.Context, RequestReportUpdate, File) (ResponseReportDetail, error)
 
-// func (fn updateFunc) Update(ctx context.Context, r Report, f File) (Report, error) {
-// 	return fn(ctx, r, f)
-// }
+func (fn updateFunc) Update(ctx context.Context, r RequestReportUpdate, f File) (ResponseReportDetail, error) {
+	return fn(ctx, r, f)
+}
 
-// func UpdateHandler(svc updateFunc) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
+func UpdateHandler(svc updateFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
 
-// 		log := logger.Unwrap(c)
+		log := logger.Unwrap(c)
 
-// 		id, err := strconv.Atoi(c.Param("id"))
-// 		if err != nil {
-// 			log.Error(err.Error())
-// 			return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
-// 		}
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
+		}
 
-// 		var r Report
-// 		r.ID = uint(id)
-// 		bind(c, &r)
+		var r RequestReportUpdate
+		r.ID = uint(id)
+		r.ItemID = c.FormValue("itemID")
+		r.Arrival = c.FormValue("arrival")
+		r.Inspection = c.FormValue("inspection")
+		r.TaskMaster = c.FormValue("taskMaster")
+		r.Invoice = c.FormValue("invoice")
+		r.Quantity = c.FormValue("quantity")
+		r.Country = c.FormValue("country")
+		r.Brand = c.FormValue("brand")
+		r.Model = c.FormValue("model")
+		r.Serial = c.FormValue("serial")
+		r.PeaNo = c.FormValue("peano")
+		r.CreateBy = c.FormValue("createby")
+		r.Status = c.FormValue("status")
 
-// 		if err := invalidRequest(&r); err != nil {
-// 			log.Error(err.Error())
-// 			return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
-// 		}
+		//// varidate data before update
 
-// 		form, _ := c.MultipartForm()
-// 		files := form.File["filesAttach"]
+		// if utils.IsEmpty(r.ItemID) {
+		// 	return errors.New(":Invalid Data Request")
+		// }
 
-// 		if err := invalidFile(files); err != nil {
-// 			log.Error(err.Error())
-// 			return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
-// 		}
+		// if err := invalidRequest(&r); err != nil {
+		// 	log.Error(err.Error())
+		// 	return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
+		// }
 
-// 		var updateFile []UpdateFile
-// 		json.Unmarshal([]byte(c.FormValue("updateDocType")), &updateFile)
-// 		fmt.Printf("update : %+v", updateFile)
+		form, _ := c.MultipartForm()
+		files := form.File["filesAttach"]
 
-// 		r, err = svc.Update(c.Request().Context(), r, File{
-// 			Info:   files,
-// 			Type:   strings.Split(c.FormValue("docType"), ","),
-// 			Update: updateFile,
-// 			Delete: strings.Split(c.FormValue("delFile"), ","),
-// 		})
+		if err := invalidFile(files); err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
+		}
 
-// 		if err != nil {
-// 			log.Error(err.Error())
-// 			return c.JSON(http.StatusInternalServerError, utils.ReaponseError{Error: err.Error()})
-// 		}
-// 		return c.JSON(http.StatusCreated, r)
+		var updateFile []UpdateFile
+		json.Unmarshal([]byte(c.FormValue("changeFileType")), &updateFile)
+		fmt.Printf("update : %+v", updateFile)
 
-// 		// claims, _ := auth.GetAuthorizedClaims(c)
-// 		// jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
+		res, err := svc.Update(c.Request().Context(), r, File{
+			Info:   files,
+			Type:   strings.Split(c.FormValue("docType"), ","),
+			Update: updateFile,
+			Delete: strings.Split(c.FormValue("removeFile"), ","),
+		})
 
-// 		// err := svc.Update(c.Request().Context(), req)
-// 		// if err != nil {
-// 		// 	log.Error(err.Error())
-// 		// 	return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
-// 		// }
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusInternalServerError, utils.ReaponseError{Error: err.Error()})
+		}
+		return c.JSON(http.StatusCreated, res)
 
-// 		// return c.String(http.StatusOK, "success")
-// 	}
-// }
+		// claims, _ := auth.GetAuthorizedClaims(c)
+		// jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
+
+		// err := svc.Update(c.Request().Context(), req)
+		// if err != nil {
+		// 	log.Error(err.Error())
+		// 	return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
+		// }
+
+		// return c.String(http.StatusOK, "success")
+	}
+}
 
 func invalidRequest(r *RequestReportCreate) error {
 	if utils.IsEmpty(r.ItemID) {

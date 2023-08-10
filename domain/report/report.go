@@ -25,6 +25,23 @@ type RequestReportCreate struct {
 	Status     string `json:"status"`
 }
 
+type RequestReportUpdate struct {
+	ID         uint
+	ItemID     string `json:"itemID"`
+	Arrival    string `json:"arrival"`
+	Inspection string `json:"inspection"`
+	TaskMaster string `json:"taskMaster"`
+	Invoice    string `json:"invoice"`
+	Quantity   string `json:"quantity"`
+	Country    string `json:"country"`
+	Brand      string `json:"brand"`
+	Model      string `json:"model"`
+	Serial     string `json:"serial"`
+	PeaNo      string `json:"peano"`
+	CreateBy   string `json:"createby"`
+	Status     string `json:"status"`
+}
+
 type FileDetail struct {
 	ID          uint
 	Name        string
@@ -64,6 +81,24 @@ func (ReportDB) TableName() string {
 	return "CPM.CPM_WORK_CONTRACT_RAD"
 }
 
+func (r *RequestReportUpdate) ToModel() ReportDB {
+	return ReportDB{
+		ID:         r.ID,
+		ItemID:     utils.StringToUint(r.ItemID),
+		Arrival:    utils.StringToTime(r.Arrival),
+		Inspection: utils.StringToTime(r.Inspection),
+		TaskMaster: r.TaskMaster,
+		Invoice:    r.Invoice,
+		Quantity:   utils.StringToUint(r.Quantity),
+		Country:    r.Country,
+		Brand:      r.Brand,
+		Model:      r.Model,
+		Serial:     r.Serial,
+		PeaNo:      r.PeaNo,
+		Status:     utils.StringToInt(r.Status),
+	}
+}
+
 func (r *RequestReportCreate) ToModel() ReportDB {
 	return ReportDB{
 		ID:         r.ID,
@@ -88,9 +123,10 @@ type File struct {
 	Update []UpdateFile
 	Delete []string
 }
+
 type UpdateFile struct {
-	FileID  uint `json:"id"`
-	DocType uint `json:"docType"`
+	FileID uint `json:"fileId"`
+	TypeID uint `json:"typeId"`
 }
 
 type AttachFileDB struct {
@@ -150,11 +186,11 @@ func (f *FileDetail) ToModel(r ReportDB) AttachFileDB {
 
 type ResponseAttachFile struct {
 	ID       uint   `json:"id" gorm:"column:ID"`
-	Name     string `json:"name" gorm:"column:FILE_NAME"`
-	Size     string `json:"size" gorm:"column:FILE_SIZE"`
-	Unit     string `json:"unit" gorm:"column:FILE_UNIT"`
+	Name     string `json:"name,omitempty" gorm:"column:FILE_NAME"`
+	Size     string `json:"size,omitempty" gorm:"column:FILE_SIZE"`
+	Unit     string `json:"unit,omitempty" gorm:"column:FILE_UNIT"`
 	TypeID   uint   `json:"typeID" gorm:"column:TYPE_ID"`
-	TypeName string `json:"typeName" gorm:"column:TYPE_NAME"`
+	TypeName string `json:"typeName,omitempty" gorm:"column:TYPE_NAME"`
 }
 type ResponseAttachFiles []ResponseAttachFile
 
@@ -180,22 +216,22 @@ type MultiReportDetailDB []ReportDetailDB
 
 type ResponseReportDetail struct {
 	ID          uint                `json:"id"`
-	ItemID      uint                `json:"itemID"`
-	ItemName    string              `json:"itemName"`
-	ItemUnit    string              `json:"itemUnit"`
-	RadNo       string              `json:"RadNo"`
-	Arrival     utils.Time          `json:"arrival"`
-	Inspection  utils.Time          `json:"inspection"`
-	TaskMaster  string              `json:"taskMaster"`
-	Invoice     string              `json:"invoice"`
-	Quantity    uint                `json:"quantity"`
-	Country     string              `json:"country"`
-	Brand       string              `json:"brand"`
-	Model       string              `json:"model"`
-	Serial      string              `json:"serial"`
-	PeaNo       string              `json:"peano"`
-	StateName   string              `json:"stateName"`
-	AttachFiles ResponseAttachFiles `json:"attachFiles"`
+	ItemID      uint                `json:"itemID,omitempty"`
+	ItemName    string              `json:"itemName,omitempty"`
+	ItemUnit    string              `json:"itemUnit,omitempty"`
+	RadNo       string              `json:"RadNo,omitempty"`
+	Arrival     utils.Time          `json:"arrival,omitempty"`
+	Inspection  utils.Time          `json:"inspection,omitempty"`
+	TaskMaster  string              `json:"taskMaster,omitempty"`
+	Invoice     string              `json:"invoice,omitempty"`
+	Quantity    uint                `json:"quantity,omitempty"`
+	Country     string              `json:"country,omitempty"`
+	Brand       string              `json:"brand,omitempty"`
+	Model       string              `json:"model,omitempty"`
+	Serial      string              `json:"serial,omitempty"`
+	PeaNo       string              `json:"peano,omitempty"`
+	StateName   string              `json:"stateName,omitempty"`
+	AttachFiles ResponseAttachFiles `json:"attachFiles,omitempty"`
 }
 
 func (r *ReportDetailDB) ToResponse(attachFiles ResponseAttachFiles) ResponseReportDetail {
