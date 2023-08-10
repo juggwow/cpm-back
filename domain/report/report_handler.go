@@ -53,9 +53,16 @@ func CreateHandler(svc createFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
 		}
 
+		fileType := func() []string {
+			if data := c.FormValue("docType"); data != "" {
+				return strings.Split(data, ",")
+			}
+			return []string{}
+		}
+
 		res, err := svc.Create(c.Request().Context(), r, File{
 			Info: files,
-			Type: strings.Split(c.FormValue("docType"), ","),
+			Type: fileType(),
 		})
 
 		if err != nil {
@@ -146,13 +153,28 @@ func UpdateHandler(svc updateFunc) echo.HandlerFunc {
 
 		var updateFile []UpdateFile
 		json.Unmarshal([]byte(c.FormValue("changeFileType")), &updateFile)
-		fmt.Printf("update : %+v", updateFile)
+		// fmt.Printf("update : %+v", updateFile)
 
+		fileType := func() []string {
+			if data := c.FormValue("docType"); data != "" {
+				return strings.Split(data, ",")
+			}
+			return []string{}
+		}
+
+		fileDel := func() []string {
+			if data := c.FormValue("removeFile"); data != "" {
+				return strings.Split(data, ",")
+			}
+			return []string{}
+		}
+		fmt.Println(len(fileType()))
+		fmt.Println(len(fileDel()))
 		res, err := svc.Update(c.Request().Context(), r, File{
 			Info:   files,
-			Type:   strings.Split(c.FormValue("docType"), ","),
+			Type:   fileType(),
 			Update: updateFile,
-			Delete: strings.Split(c.FormValue("removeFile"), ","),
+			Delete: fileDel(),
 		})
 
 		if err != nil {
