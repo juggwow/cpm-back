@@ -17,7 +17,7 @@ func GetByItem(db *connection.DBConnection) getByItemFunc {
 		var item Item
 
 		cpm := db.CPM.Model(&item)
-		err = cpm.Select("ID,NAME,CONCAT(QUANTITY,' ',UNIT) AS CONTRACT_QTY,CONCAT('0 ',UNIT) AS DELIVERED_QTY").
+		err = cpm.Select("ID,NAME,CONCAT(QUANTITY,' ',UNIT) AS CONTRACT_QTY,CONCAT(SUM(RECEIVE_QUANTITY),' ',UNIT) AS RECEIVE_QTY").
 			Where("ID = ?", id).Scan(&item).Error
 
 		result = Response{

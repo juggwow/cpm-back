@@ -11,10 +11,10 @@ type Response struct {
 }
 
 type Item struct {
-	ID           uint   `json:"id" gorm:"column:ID"`
-	Name         string `json:"name" gorm:"column:NAME"`
-	ContractQTY  string `json:"contractQTY" gorm:"column:CONTRACT_QTY"`
-	DeliveredQTY string `json:"deliveredQTY" gorm:"column:DELIVERED_QTY"`
+	ID          uint   `json:"id" gorm:"column:ID"`
+	Name        string `json:"name" gorm:"column:NAME"`
+	ContractQTY string `json:"contractQTY" gorm:"column:CONTRACT_QTY"`
+	ReceiveQTY  string `json:"receiveQTY" gorm:"column:RECEIVE_QTY"`
 }
 
 func (Item) TableName() string {
