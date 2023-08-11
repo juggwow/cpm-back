@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
@@ -82,15 +82,17 @@ func (a *Authenticator) getCallbackToken(c *echo.Context, svc getEmployeeFunc) (
 	idToken.Claims(&rawClaims)
 
 	log := logger.Unwrap(*c)
-	log.Info(rawClaims.Sub)
+	log.Info(fmt.Sprintln(rawClaims))
+	// Check is PEA Employee
+	// if rawClaims.Sub[:2] == "f:" {
+	// 	emp, _ := svc.GetAuthorizedEmployee(context.TODO(), rawClaims.toEmployee())
+	// 	claims := rawClaims.toEmployeeClaims(*emp.ToResponse(), rawIDToken)
+	// 	return &claims, rawIDToken, err
+	// }
 
-	claims := JwtEmployeeClaims{
-		EmployeeResponse: employee.EmployeeResponse{},
-		StandardClaims:   jwt.StandardClaims{},
-	}
-
-	// emp, _ := svc.GetAuthorizedEmployee(nil, rawClaims.toEmployee())
-	// claims := rawClaims.toEmployeeClaims(*emp.ToResponse(), rawIDToken)
+	//emp, _ := svc.GetAuthorizedEmployee(nil, rawClaims.toEmployee())
+	emp, _ := svc.GetAuthorizedEmployee(context.TODO(), rawClaims.toEmployee())
+	claims := rawClaims.toEmployeeClaims(*emp.ToResponse(), rawIDToken)
 
 	return &claims, rawIDToken, err
 }
@@ -134,7 +136,7 @@ func (a *Authenticator) AuthenHandler() echo.HandlerFunc {
 
 		token, err := jwt.Parse(tokenString.Value, func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok || !t.Valid {
-				return nil, fmt.Errorf("Unexpected signing method: %v", t.Header["alg"])
+				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 			}
 			return []byte(config.AuthJWTSecret), nil
 		})
@@ -181,7 +183,7 @@ func (a *Authenticator) AuthenCallbackHandler(
 		}
 
 		authLog := AuthLog{
-			ID:         claims.Id,
+			ID:         claims.ID,
 			IP:         c.RealIP(),
 			IDToken:    idToken,
 			EmployeeID: claims.EmployeeID,
@@ -250,7 +252,7 @@ func (a Authenticator) GetRefreshTokenHandler(svc getIDTokenFunc) echo.HandlerFu
 			return err
 		}
 
-		idToken, err := svc.GetIDToken(c.Request().Context(), claims.Id)
+		idToken, err := svc.GetIDToken(c.Request().Context(), claims.ID)
 		if err != nil {
 			return err
 		}
@@ -280,12 +282,13 @@ func (a Authenticator) LogoutHandler(svc getIDTokenFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		logger.Unwrap(c)
 
-		parser := &jwt.Parser{
-			SkipClaimsValidation: true,
-		}
+		// parser := &jwt.Parser{
+		// 	SkipClaimsValidation: true,
+		// }
+		parser := jwt.NewParser(jwt.WithoutClaimsValidation())
 
 		claims := JwtEmployeeClaims{}
-		parser.ParseWithClaims(c.Param("token"), &claims, func(token *jwt.Token) (interface{}, error) {
+		parser.ParseWithClaims(c.Param("token"), claims, func(token *jwt.Token) (interface{}, error) {
 			return []byte(config.AuthJWTSecret), nil
 		})
 
@@ -299,7 +302,7 @@ func (a Authenticator) LogoutHandler(svc getIDTokenFunc) echo.HandlerFunc {
 			return err
 		}
 
-		idToken, err := svc.GetIDToken(c.Request().Context(), claims.Id)
+		idToken, err := svc.GetIDToken(c.Request().Context(), claims.ID)
 		if err != nil {
 			return err
 		}

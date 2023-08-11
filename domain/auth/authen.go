@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/xid"
 	"golang.org/x/oauth2"
 )
@@ -33,7 +33,7 @@ type Authenticator struct {
 
 type JwtEmployeeClaims struct {
 	employee.EmployeeResponse
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 type keyClockClaims struct {
@@ -66,10 +66,10 @@ type refreshTokenResponse struct {
 func (a keyClockClaims) toEmployeeClaims(emp employee.EmployeeResponse, token string) JwtEmployeeClaims {
 	return JwtEmployeeClaims{
 		EmployeeResponse: emp,
-		StandardClaims: jwt.StandardClaims{
-			Audience: a.Aud,
-			Id:       xid.New().String(),
-			IssuedAt: a.Iat,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Audience: []string{a.Aud},
+			ID:       xid.New().String(),
+			IssuedAt: jwt.NewNumericDate(time.Now()), //a.Iat
 			Subject:  emp.EmployeeID,
 			Issuer:   config.AppURL,
 		},
@@ -86,8 +86,8 @@ func (a keyClockClaims) toEmployee() employee.Employee {
 
 func (claims JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
 	tokenClaims := claims
-	tokenClaims.IssuedAt = time.Now().Unix()
-	tokenClaims.ExpiresAt = time.Now().Add(expiredDuration).Unix()
+	tokenClaims.IssuedAt = jwt.NewNumericDate(time.Now())
+	tokenClaims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(expiredDuration))
 	return jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		&tokenClaims,

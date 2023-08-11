@@ -15,7 +15,6 @@ import (
 	"cpm-rad-backend/domain/minio"
 	"cpm-rad-backend/domain/raddoc"
 	"cpm-rad-backend/domain/report"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -23,6 +22,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -49,8 +50,8 @@ func main() {
 	cpmDB, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("can't connect DB : %v", err)
-		// panic(err)
-		config.DBCon = config.DBCon + "\nDB : " + fmt.Sprintf("can't connect DB : %v", err)
+		panic(err)
+		// config.DBCon = config.DBCon + "\nDB : " + fmt.Sprintf("can't connect DB : %v", err)
 	}
 
 	db := &connection.DBConnection{
@@ -96,8 +97,8 @@ func initMinio() minio.Client {
 	}
 	if err := minio.NewConnection(conf); err != nil {
 		log.Fatalf("can't connect MINIO client: %v", err)
-		// panic(err)
-		config.DBCon = config.DBCon + "\nMinio : " + fmt.Sprintf("can't connect MINIO client : %v", err)
+		panic(err)
+		// config.DBCon = config.DBCon + "\nMinio : " + fmt.Sprintf("can't connect MINIO client : %v", err)
 	}
 
 	minioClient := minio.GetClient()
@@ -127,11 +128,21 @@ func getRoute(zaplog *zap.Logger) *echo.Echo {
 	return e
 }
 
+// func getAuthMiddleware() echo.MiddlewareFunc {
+// 	return middleware.JWTWithConfig(middleware.JWTConfig{
+// 		Claims:      &auth.JwtEmployeeClaims{},
+// 		SigningKey:  []byte(config.AuthJWTSecret),
+// 		TokenLookup: "header:Authorization,cookie:" + config.AuthJWTKey,
+// 	})
+// }
+
 func getAuthMiddleware() echo.MiddlewareFunc {
-	return middleware.JWTWithConfig(middleware.JWTConfig{
-		Claims:      &auth.JwtEmployeeClaims{},
+	return echojwt.WithConfig(echojwt.Config{
 		SigningKey:  []byte(config.AuthJWTSecret),
 		TokenLookup: "header:Authorization,cookie:" + config.AuthJWTKey,
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return &auth.JwtEmployeeClaims{}
+		},
 	})
 }
 
@@ -148,8 +159,8 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 
 	} else {
 		log.Fatalf("Fatal initiate authenticator: %v\n", err)
-		// panic(err)
-		config.DBCon = config.DBCon + "\nAuth : " + fmt.Sprintf("Fatal initiate authenticator: %v", err)
+		panic(err)
+		// config.DBCon = config.DBCon + "\nAuth : " + fmt.Sprintf("Fatal initiate authenticator: %v", err)
 	}
 }
 
