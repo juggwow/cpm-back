@@ -1,8 +1,8 @@
 package employee
 
 import (
+	"cpm-rad-backend/domain/auth/user_profile"
 	"cpm-rad-backend/domain/connection"
-	"cpm-rad-backend/domain/user_profile"
 )
 
 type Employee struct {
@@ -32,7 +32,7 @@ type EmployeeRequest struct {
 }
 
 type EmployeeResponse struct {
-	Id             uint   `json:"id"`
+	ID             uint   `json:"id"`
 	EmployeeID     string `json:"employeeId"`
 	Title          string `json:"title"`
 	FirstName      string `json:"firstName"`
@@ -44,7 +44,7 @@ type EmployeeResponse struct {
 
 func (employee *Employee) ToResponse() *EmployeeResponse {
 	return &EmployeeResponse{
-		Id:             employee.ID,
+		ID:             employee.ID,
 		EmployeeID:     employee.EmployeeID,
 		Title:          employee.Title,
 		FirstName:      employee.FirstName,

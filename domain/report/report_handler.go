@@ -181,9 +181,10 @@ func UpdateHandler(svc updateFunc) echo.HandlerFunc {
 			log.Error(err.Error())
 			return c.JSON(http.StatusInternalServerError, utils.ReaponseError{Error: err.Error()})
 		}
-		return c.JSON(http.StatusCreated, res)
 
 		// claims, _ := auth.GetAuthorizedClaims(c)
+		// log.Info(claims.EmployeeID)
+
 		// jobID, err := svc.Create(c.Request().Context(), reqJob, claims.EmployeeID)
 
 		// err := svc.Update(c.Request().Context(), req)
@@ -192,7 +193,7 @@ func UpdateHandler(svc updateFunc) echo.HandlerFunc {
 		// 	return c.JSON(http.StatusInternalServerError, response.Error{Error: err.Error()})
 		// }
 
-		// return c.String(http.StatusOK, "success")
+		return c.JSON(http.StatusCreated, res)
 	}
 }
 

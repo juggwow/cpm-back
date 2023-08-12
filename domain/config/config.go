@@ -45,7 +45,7 @@ func InitConfig() {
 
 	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
 
-	viper.SetDefault("auth.jwt.enabled", false)
+	viper.SetDefault("auth.jwt.enabled", true)
 
 	viper.SetDefault("storage.ssl", true)
 

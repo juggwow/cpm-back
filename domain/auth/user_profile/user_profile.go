@@ -13,6 +13,6 @@ type UserProfile struct {
 
 type UserProfiles []UserProfile
 
-func (UserProfile) TableName() string {
-	return "[WDDEVDB\\WORKD].CPM.CPM.CPM_USER_PROFILE"
-}
+// func (UserProfile) TableName() string {
+// 	return "CPM.GET_USER_PROFILE()"
+// }

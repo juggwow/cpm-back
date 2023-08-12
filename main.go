@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"cpm-rad-backend/domain/auth"
+	"cpm-rad-backend/domain/auth/employee"
 	"cpm-rad-backend/domain/boq"
 	"cpm-rad-backend/domain/boqItem"
 	"cpm-rad-backend/domain/config"
 	"cpm-rad-backend/domain/connection"
 	"cpm-rad-backend/domain/contract"
-	"cpm-rad-backend/domain/employee"
 	"cpm-rad-backend/domain/form"
 	"cpm-rad-backend/domain/health_check"
 	"cpm-rad-backend/domain/logger"
@@ -22,8 +22,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -60,11 +58,14 @@ func main() {
 
 	// db := &connection.DBConnection{}
 
-	// err = cpmDB.AutoMigrate()
+	err = cpmDB.AutoMigrate(
+		&employee.Employee{},
+		&auth.AuthLog{},
+	)
 
-	// if err != nil {
-	// 	return
-	// }
+	if err != nil {
+		return
+	}
 
 	minioClient := initMinio()
 
@@ -128,23 +129,23 @@ func getRoute(zaplog *zap.Logger) *echo.Echo {
 	return e
 }
 
-// func getAuthMiddleware() echo.MiddlewareFunc {
-// 	return middleware.JWTWithConfig(middleware.JWTConfig{
-// 		Claims:      &auth.JwtEmployeeClaims{},
-// 		SigningKey:  []byte(config.AuthJWTSecret),
-// 		TokenLookup: "header:Authorization,cookie:" + config.AuthJWTKey,
-// 	})
-// }
-
 func getAuthMiddleware() echo.MiddlewareFunc {
-	return echojwt.WithConfig(echojwt.Config{
+	return middleware.JWTWithConfig(middleware.JWTConfig{
+		Claims:      &auth.JwtEmployeeClaims{},
 		SigningKey:  []byte(config.AuthJWTSecret),
 		TokenLookup: "header:Authorization,cookie:" + config.AuthJWTKey,
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return &auth.JwtEmployeeClaims{}
-		},
 	})
 }
+
+// func getAuthMiddleware() echo.MiddlewareFunc {
+// 	return echojwt.WithConfig(echojwt.Config{
+// 		SigningKey:  []byte(config.AuthJWTSecret),
+// 		TokenLookup: "header:Authorization,cookie:" + config.AuthJWTKey,
+// 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+// 			return &auth.JwtEmployeeClaims{}
+// 		},
+// 	})
+// }
 
 func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.Client) {
 
@@ -154,8 +155,8 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 	if authenticator, err := auth.NewAuthenticator(); err == nil {
 		e.GET("/auth", authenticator.AuthenHandler())
 		e.GET("/auth/callback", authenticator.AuthenCallbackHandler(employee.GetAndCreateIfNotExist(db), auth.CreateLog(db)))
-		e.GET("/auth/refreshToken", authenticator.GetRefreshTokenHandler(auth.GetIDToken(db)), getAuthMiddleware())
-		e.GET("/auth/logout/:token", authenticator.LogoutHandler(auth.GetIDToken(db)))
+		e.GET("/auth/refreshToken", authenticator.GetRefreshTokenHandler(), getAuthMiddleware())
+		e.GET("/auth/logout/:token", authenticator.LogoutHandler())
 
 	} else {
 		log.Fatalf("Fatal initiate authenticator: %v\n", err)

@@ -2,12 +2,13 @@ package auth
 
 import (
 	"context"
+	"cpm-rad-backend/domain/auth/employee"
 	"cpm-rad-backend/domain/config"
-	"cpm-rad-backend/domain/employee"
 	"time"
 
+	"github.com/allegro/bigcache/v3"
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt"
 	"github.com/rs/xid"
 	"golang.org/x/oauth2"
 )
@@ -21,19 +22,21 @@ type AuthLog struct {
 }
 
 func (AuthLog) TableName() string {
-	return "CMDC_AUTH_LOG"
+	return "JWT_AUTH_LOG"
 }
 
 type Authenticator struct {
 	provider     *oidc.Provider
 	clientConfig *oauth2.Config
-	verifier     *oidc.IDTokenVerifier
-	ctx          context.Context
+	// verifier     *oidc.IDTokenVerifier
+	idTokenMap *bigcache.BigCache
+	ctx        context.Context
 }
 
 type JwtEmployeeClaims struct {
 	employee.EmployeeResponse
-	jwt.RegisteredClaims
+	jwt.StandardClaims
+	// jwt.RegisteredClaims
 }
 
 type keyClockClaims struct {
@@ -63,13 +66,25 @@ type refreshTokenResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+//	func (a keyClockClaims) toEmployeeClaims(emp employee.EmployeeResponse, token string) JwtEmployeeClaims {
+//		return JwtEmployeeClaims{
+//			EmployeeResponse: emp,
+//			RegisteredClaims: jwt.RegisteredClaims{
+//				Audience: []string{a.Aud},
+//				ID:       xid.New().String(),
+//				IssuedAt: jwt.NewNumericDate(time.Unix(a.Iat, 0)), //a.Iat
+//				Subject:  emp.EmployeeID,
+//				Issuer:   config.AppURL,
+//			},
+//		}
+//	}
 func (a keyClockClaims) toEmployeeClaims(emp employee.EmployeeResponse, token string) JwtEmployeeClaims {
 	return JwtEmployeeClaims{
 		EmployeeResponse: emp,
-		RegisteredClaims: jwt.RegisteredClaims{
-			Audience: []string{a.Aud},
-			ID:       xid.New().String(),
-			IssuedAt: jwt.NewNumericDate(time.Now()), //a.Iat
+		StandardClaims: jwt.StandardClaims{
+			Audience: a.Aud,
+			Id:       xid.New().String(),
+			IssuedAt: a.Iat,
 			Subject:  emp.EmployeeID,
 			Issuer:   config.AppURL,
 		},
@@ -84,12 +99,22 @@ func (a keyClockClaims) toEmployee() employee.Employee {
 	}
 }
 
-func (claims JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
-	tokenClaims := claims
-	tokenClaims.IssuedAt = jwt.NewNumericDate(time.Now())
-	tokenClaims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(expiredDuration))
-	return jwt.NewWithClaims(
-		jwt.SigningMethodHS256,
-		&tokenClaims,
-	).SignedString([]byte(config.AuthJWTSecret))
-}
+// func (claims JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
+// 	tokenClaims := claims
+// 	tokenClaims.IssuedAt = jwt.NewNumericDate(time.Now())
+// 	tokenClaims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(expiredDuration))
+// 	return jwt.NewWithClaims(
+// 		jwt.SigningMethodHS256,
+// 		&tokenClaims,
+// 	).SignedString([]byte(config.AuthJWTSecret))
+// }
+
+// func (claims *JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
+// 	claims.Id = xid.New().String()
+// 	claims.IssuedAt = time.Now().Unix()
+// 	claims.ExpiresAt = time.Now().Add(expiredDuration).Unix()
+// 	return jwt.NewWithClaims(
+// 		jwt.SigningMethodHS256,
+// 		claims,
+// 	).SignedString([]byte(config.AuthJWTSecret))
+// }

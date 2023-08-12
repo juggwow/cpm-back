@@ -2,8 +2,8 @@ package employee
 
 import (
 	"context"
+	"cpm-rad-backend/domain/auth/user_profile"
 	"cpm-rad-backend/domain/connection"
-	"cpm-rad-backend/domain/user_profile"
 	"errors"
 	"time"
 
@@ -22,7 +22,11 @@ func GetByID(db *connection.DBConnection) func(context.Context, string) (Employe
 	return func(ctx context.Context, employeeID string) (Employee, error) {
 		employee := &Employee{}
 		profile := &user_profile.UserProfile{}
-		err := db.CPM.First(profile, "EMP_ID LIKE ?", "%"+employeeID+"%").Error
+		// err := db.CPM.First(profile, "EMP_ID LIKE ?", "%"+employeeID+"%").Error
+		cpm := db.CPM.Model(&profile)
+		err := cpm.Table("CPM.GET_USER_PROFILE(?)", employeeID).
+			Scan(&profile).
+			Error
 		if err != nil {
 			// TODO: remove ignore error when EMPLOYEE ID not found in USER_PROFILE
 			// employee.EmployeeID = employeeID
