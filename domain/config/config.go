@@ -43,7 +43,7 @@ func InitConfig() {
 	viper.SetDefault("web.loadFile.url", "http://localhost:4200/file/")
 	// viper.SetDefault("web.fileAttachment.url", "http://localhost:4200/pdf/file")
 
-	viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
+	// viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
 
 	viper.SetDefault("auth.jwt.enabled", true)
 
