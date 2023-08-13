@@ -50,7 +50,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't connect DB : %v", err)
 		panic(err)
-		// config.DBCon = config.DBCon + "\nDB : " + fmt.Sprintf("can't connect DB : %v", err)
 	}
 
 	db := &connection.DBConnection{
@@ -100,7 +99,6 @@ func initMinio() minio.Client {
 	if err := minio.NewConnection(conf); err != nil {
 		log.Fatalf("can't connect MINIO client: %v", err)
 		panic(err)
-		// config.DBCon = config.DBCon + "\nMinio : " + fmt.Sprintf("can't connect MINIO client : %v", err)
 	}
 
 	minioClient := minio.GetClient()
