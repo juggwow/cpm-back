@@ -50,7 +50,7 @@ func main() {
 	fmt.Println(config.DBCpm)
 	cpmDB, err := gorm.Open(sqlserver.Open(config.DBCpm), &gorm.Config{})
 	if err != nil {
-		log.Fatalf(config.DBCpm)
+		log.Fatalf("can't connect DB : %v", err)
 		panic(err)
 		// config.DBCon = config.DBCon + "\nDB : " + fmt.Sprintf("can't connect DB : %v", err)
 	}
