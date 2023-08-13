@@ -32,7 +32,7 @@ type EmployeeRequest struct {
 }
 
 type EmployeeResponse struct {
-	ID             uint   `json:"id"`
+	Id             uint   `json:"id"`
 	EmployeeID     string `json:"employeeId"`
 	Title          string `json:"title"`
 	FirstName      string `json:"firstName"`
@@ -44,7 +44,7 @@ type EmployeeResponse struct {
 
 func (employee *Employee) ToResponse() *EmployeeResponse {
 	return &EmployeeResponse{
-		ID:             employee.ID,
+		Id:             employee.ID,
 		EmployeeID:     employee.EmployeeID,
 		Title:          employee.Title,
 		FirstName:      employee.FirstName,

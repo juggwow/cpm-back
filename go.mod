@@ -5,7 +5,6 @@ go 1.18
 require (
 	github.com/coreos/go-oidc/v3 v3.6.0
 	github.com/golang-jwt/jwt/v5 v5.0.0
-	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/shopspring/decimal v1.3.1
 )
 
@@ -30,7 +29,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/swaggo/swag v1.16.1 // indirect
-	golang.org/x/exp v0.0.0-20230810033253-352e893a4cad // indirect
+	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb // indirect
 	golang.org/x/tools v0.12.0 // indirect
 )
 
@@ -45,6 +44,7 @@ require (
 	github.com/inhies/go-bytesize v0.0.0-20220417184213-4913239db9cf
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/labstack/gommon v0.4.0
 	github.com/magiconair/properties v1.8.7 // indirect

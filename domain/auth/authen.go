@@ -8,7 +8,7 @@ import (
 
 	"github.com/allegro/bigcache/v3"
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/xid"
 	"golang.org/x/oauth2"
 )
@@ -35,8 +35,8 @@ type Authenticator struct {
 
 type JwtEmployeeClaims struct {
 	employee.EmployeeResponse
-	jwt.StandardClaims
-	// jwt.RegisteredClaims
+	// jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 type keyClockClaims struct {
@@ -66,30 +66,32 @@ type refreshTokenResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-//	func (a keyClockClaims) toEmployeeClaims(emp employee.EmployeeResponse, token string) JwtEmployeeClaims {
-//		return JwtEmployeeClaims{
-//			EmployeeResponse: emp,
-//			RegisteredClaims: jwt.RegisteredClaims{
-//				Audience: []string{a.Aud},
-//				ID:       xid.New().String(),
-//				IssuedAt: jwt.NewNumericDate(time.Unix(a.Iat, 0)), //a.Iat
-//				Subject:  emp.EmployeeID,
-//				Issuer:   config.AppURL,
-//			},
-//		}
-//	}
 func (a keyClockClaims) toEmployeeClaims(emp employee.EmployeeResponse, token string) JwtEmployeeClaims {
 	return JwtEmployeeClaims{
 		EmployeeResponse: emp,
-		StandardClaims: jwt.StandardClaims{
-			Audience: a.Aud,
-			Id:       xid.New().String(),
-			IssuedAt: a.Iat,
-			Subject:  emp.EmployeeID,
-			Issuer:   config.AppURL,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    config.AppURL,
+			Subject:   emp.EmployeeID,
+			Audience:  []string{a.Aud},
+			ExpiresAt: jwt.NewNumericDate(time.Unix(a.Exp, 0)),
+			IssuedAt:  jwt.NewNumericDate(time.Unix(a.Iat, 0)),
+			ID:        xid.New().String(),
 		},
 	}
 }
+
+// func (a keyClockClaims) toEmployeeClaims(emp employee.EmployeeResponse, token string) JwtEmployeeClaims {
+// 	return JwtEmployeeClaims{
+// 		EmployeeResponse: emp,
+// 		StandardClaims: jwt.StandardClaims{
+// 			Audience: a.Aud,
+// 			Id:       xid.New().String(),
+// 			IssuedAt: a.Iat,
+// 			Subject:  emp.EmployeeID,
+// 			Issuer:   config.AppURL,
+// 		},
+// 	}
+// }
 
 func (a keyClockClaims) toEmployee() employee.Employee {
 	return employee.Employee{
@@ -98,23 +100,3 @@ func (a keyClockClaims) toEmployee() employee.Employee {
 		LastName:   a.FamilyName,
 	}
 }
-
-// func (claims JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
-// 	tokenClaims := claims
-// 	tokenClaims.IssuedAt = jwt.NewNumericDate(time.Now())
-// 	tokenClaims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(expiredDuration))
-// 	return jwt.NewWithClaims(
-// 		jwt.SigningMethodHS256,
-// 		&tokenClaims,
-// 	).SignedString([]byte(config.AuthJWTSecret))
-// }
-
-// func (claims *JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
-// 	claims.Id = xid.New().String()
-// 	claims.IssuedAt = time.Now().Unix()
-// 	claims.ExpiresAt = time.Now().Add(expiredDuration).Unix()
-// 	return jwt.NewWithClaims(
-// 		jwt.SigningMethodHS256,
-// 		claims,
-// 	).SignedString([]byte(config.AuthJWTSecret))
-// }

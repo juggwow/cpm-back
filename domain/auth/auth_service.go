@@ -11,7 +11,7 @@ import (
 
 	"github.com/allegro/bigcache/v3"
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/xid"
 	"go.uber.org/zap"
@@ -146,15 +146,25 @@ func (a *Authenticator) getCallbackToken(c *echo.Context, svc getEmployeeFunc) (
 	return &claims, rawIDToken, err
 }
 
-func (claims *JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
-	claims.Id = xid.New().String()
-	claims.IssuedAt = time.Now().Unix()
-	claims.ExpiresAt = time.Now().Add(expiredDuration).Unix()
+func (claims JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
+	claims.ID = xid.New().String()
+	claims.IssuedAt = jwt.NewNumericDate(time.Now())
+	claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(expiredDuration))
 	return jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
-		claims,
+		&claims,
 	).SignedString([]byte(config.AuthJWTSecret))
 }
+
+// func (claims *JwtEmployeeClaims) getToken(expiredDuration time.Duration) (string, error) {
+// 	claims.Id = xid.New().String()
+// 	claims.IssuedAt = time.Now().Unix()
+// 	claims.ExpiresAt = time.Now().Add(expiredDuration).Unix()
+// 	return jwt.NewWithClaims(
+// 		jwt.SigningMethodHS256,
+// 		claims,
+// 	).SignedString([]byte(config.AuthJWTSecret))
+// }
 
 func GetAuthorizedClaims(c echo.Context) (JwtEmployeeClaims, error) {
 	user, ok := c.Get("user").(*jwt.Token)

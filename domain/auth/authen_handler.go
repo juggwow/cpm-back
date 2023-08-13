@@ -3,11 +3,12 @@ package auth
 import (
 	"cpm-rad-backend/domain/config"
 	"cpm-rad-backend/domain/logger"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 )
@@ -180,7 +181,7 @@ func (a *Authenticator) AuthenCallbackHandler(svc getEmployeeFunc, svc2 createAu
 		a.idTokenMap.Set(claims.EmployeeID, []byte(idToken))
 
 		authLog := AuthLog{
-			ID:         claims.Id,
+			ID:         claims.ID,
 			IP:         c.RealIP(),
 			IDToken:    idToken,
 			EmployeeID: claims.EmployeeID,
@@ -269,10 +270,10 @@ func (a Authenticator) LogoutHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		logger.Unwrap(c)
 
-		parser := &jwt.Parser{
-			SkipClaimsValidation: true,
-		}
-		// parser := jwt.NewParser(jwt.WithoutClaimsValidation())
+		// parser := &jwt.Parser{
+		// 	SkipClaimsValidation: true,
+		// }
+		parser := jwt.NewParser(jwt.WithoutClaimsValidation())
 		// claims := JwtEmployeeClaims{}
 
 		claims := &JwtEmployeeClaims{}
@@ -299,7 +300,7 @@ func (a Authenticator) LogoutHandler() echo.HandlerFunc {
 // @Security ApiKeyAuth
 func GetCurrentHandler(c echo.Context) error {
 	logger.Unwrap(c)
-
+	fmt.Sprintln("GetCurrentHandler")
 	claims, err := GetAuthorizedClaims(c)
 	if err != nil {
 		return err

@@ -22,6 +22,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -129,23 +131,23 @@ func getRoute(zaplog *zap.Logger) *echo.Echo {
 	return e
 }
 
-func getAuthMiddleware() echo.MiddlewareFunc {
-	return middleware.JWTWithConfig(middleware.JWTConfig{
-		Claims:      &auth.JwtEmployeeClaims{},
-		SigningKey:  []byte(config.AuthJWTSecret),
-		TokenLookup: "header:Authorization,cookie:" + config.AuthJWTKey,
-	})
-}
-
 // func getAuthMiddleware() echo.MiddlewareFunc {
-// 	return echojwt.WithConfig(echojwt.Config{
+// 	return middleware.JWTWithConfig(middleware.JWTConfig{
+// 		Claims:      &auth.JwtEmployeeClaims{},
 // 		SigningKey:  []byte(config.AuthJWTSecret),
 // 		TokenLookup: "header:Authorization,cookie:" + config.AuthJWTKey,
-// 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-// 			return &auth.JwtEmployeeClaims{}
-// 		},
 // 	})
 // }
+
+func getAuthMiddleware() echo.MiddlewareFunc {
+	return echojwt.WithConfig(echojwt.Config{
+		SigningKey:  []byte(config.AuthJWTSecret),
+		TokenLookup: "header:Authorization:Bearer ,cookie:" + config.AuthJWTKey,
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return &auth.JwtEmployeeClaims{}
+		},
+	})
+}
 
 func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.Client) {
 
