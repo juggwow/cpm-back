@@ -33,20 +33,9 @@ var StorageBucketName string
 var DitoApi string
 var DBCon string
 
-// var FileAttachmentURL string
-
 func InitConfig() {
-	viper.SetDefault("app.url", "http://localhost:8000")
-	viper.SetDefault("app.port", "8000")
-
-	viper.SetDefault("web.url", "http://localhost:4200")
-	viper.SetDefault("web.loadFile.url", "http://localhost:4200/file/")
-	// viper.SetDefault("web.fileAttachment.url", "http://localhost:4200/pdf/file")
-
-	// viper.SetDefault("auth.callback.url", "http://localhost:8000/auth/callback")
 
 	viper.SetDefault("auth.jwt.enabled", true)
-
 	viper.SetDefault("storage.ssl", true)
 
 	viper.SetConfigName("config")
@@ -55,15 +44,10 @@ func InitConfig() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		zap.L().Warn(fmt.Sprintf("Fatal error config file: %s \n", err))
-		// DBCon = fmt.Sprintf("Fatal error config file: %s \n", err)
 	}
 
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-
-	// DBCon = "env : " + viper.GetString("db.rad")
-	// DBCon = DBCon + "\nsecretKey : " + viper.GetString("storage.secretKey")
-	// DBCon = DBCon + "\naccessKey : " + viper.GetString("storage.accessKey")
 
 	AppURL = viper.GetString("app.url")
 	AppPort = viper.GetString("app.port")
@@ -88,7 +72,5 @@ func InitConfig() {
 	AuthURL = viper.GetString("auth.url")
 
 	DitoApi = viper.GetString("dito.endpoint")
-
-	// FileAttachmentURL = viper.GetString("web.fileAttachment.url")
 
 }
