@@ -191,16 +191,16 @@ func (a Authenticator) getLogoutURL(claims *JwtEmployeeClaims) (string, error) {
 	}
 
 	// #SSO2 comment This
-	idToken, err := a.idTokenMap.Get(claims.EmployeeID)
-	if err != nil {
-		return "", err
-	}
+	// idToken, err := a.idTokenMap.Get(claims.EmployeeID)
+	// if err != nil {
+	// 	return "", err
+	// }
 	// #
 
 	q := urlInfo.Query()
 	q.Set("post_logout_redirect_uri", config.AppURL+"/auth")
 	// #SSO2 comment This
-	q.Set("id_token_hint", string(idToken))
+	//q.Set("id_token_hint", string(idToken))
 	// #
 	urlInfo.RawQuery = q.Encode()
 	return urlInfo.String(), nil
