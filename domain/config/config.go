@@ -34,6 +34,27 @@ var DitoApi string
 var DBCon string
 
 func InitConfig() {
+	viper.SetDefault("app.url", "http://localhost:8000")
+	viper.SetDefault("app.port", "8000")
+	viper.SetDefault("db.rad", "sqlserver://devpool_rad:X1CreIrddfAa5BR4P13resqbUzVGVqop@10.4.34.117:50868?database=RAD")
+
+	viper.SetDefault("web.url", "http://localhost:4200")
+	viper.SetDefault("web.loadFile.url", "http://localhost:4200/file")
+
+	viper.SetDefault("auth.callback.url", "http://localhost:4200/contract/31")
+	viper.SetDefault("auth.client.id", "CMDC")
+	viper.SetDefault("auth.client.secret", "c31bfd34-5de8-4630-a667-9864c02ae455")
+	viper.SetDefault("auth.url", "https://sso.pea.co.th/auth/realms/idm")
+	viper.SetDefault("auth.jwt.key", "rad-token")
+	viper.SetDefault("auth.jwt.secret", "super-secret")
+	viper.SetDefault("auth.state", "state")
+
+	viper.SetDefault("storage.endpoint", "minio-api-kolpos.pea.co.th")
+	viper.SetDefault("storage.accessKey", "RhoF4o6NbIHzyiei")
+	viper.SetDefault("storage.secretKey", "F2epUU6tAeAFBeOB7OGl1DIVaLacmzBc")
+	viper.SetDefault("storage.bucketName", "devpool-rad")
+
+	viper.SetDefault("dito.endpoint", "http://172.30.211.224:42/api/pdf-producer/")
 
 	viper.SetDefault("auth.jwt.enabled", true)
 	viper.SetDefault("storage.ssl", true)
