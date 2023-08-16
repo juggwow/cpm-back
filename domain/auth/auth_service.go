@@ -37,10 +37,10 @@ func NewAuthenticator() (*Authenticator, error) {
 		return nil, err
 	}
 
-	redirectURL, err := url.JoinPath(config.AppURL, "/auth/callback")
-	if err != nil {
-		return nil, err
-	}
+	// redirectURL, err := url.JoinPath(config.AppURL, "/auth/callback")
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	cacheConfig := bigcache.DefaultConfig(24 * time.Hour)
 	cacheConfig.Verbose = true
@@ -52,9 +52,9 @@ func NewAuthenticator() (*Authenticator, error) {
 	config := &oauth2.Config{
 		ClientID:     config.AuthClientID,
 		ClientSecret: config.AuthClientSecret,
-		RedirectURL:  redirectURL,
-		Endpoint:     provider.Endpoint(),
-		Scopes:       []string{oidc.ScopeOpenID, "profile"},
+		// RedirectURL:  redirectURL,
+		Endpoint: provider.Endpoint(),
+		Scopes:   []string{oidc.ScopeOpenID, "profile"},
 	}
 
 	return &Authenticator{
@@ -86,8 +86,12 @@ func getSecretKey(t *jwt.Token) (interface{}, error) {
 // 	return claims
 // }
 
-func (a *Authenticator) getCallbackURL(token string, err error) string {
+func (a *Authenticator) getCallbackURL(webRedirectURL string, token string, err error) string {
+
 	callbackURL := config.AuthCallbackURL
+	if webRedirectURL != "" {
+		callbackURL = webRedirectURL
+	}
 	if token == "" {
 		return callbackURL
 	}

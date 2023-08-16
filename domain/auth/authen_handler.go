@@ -131,9 +131,12 @@ import (
 func (a *Authenticator) AuthenHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		logger.Unwrap(c)
+		webRedirectURL := c.QueryParam("page")
+		a.clientConfig.RedirectURL = config.AppURL + "/auth/callback" + "?page=" + webRedirectURL
 
 		tokenString, err := c.Cookie(config.AuthJWTKey)
 		if err != nil || tokenString == nil {
+			fmt.Println("round1")
 			c.Redirect(http.StatusTemporaryRedirect, a.getAuthURL())
 			return nil
 		}
@@ -141,22 +144,25 @@ func (a *Authenticator) AuthenHandler() echo.HandlerFunc {
 		token, err := jwt.Parse(tokenString.Value, getSecretKey)
 
 		if err != nil {
+			fmt.Println("round2")
 			c.Redirect(http.StatusTemporaryRedirect, a.getAuthURL())
 			return nil
 		}
 
 		if token == nil || !token.Valid {
+			fmt.Println("round3")
 			c.Redirect(http.StatusTemporaryRedirect, a.getAuthURL())
 			return nil
 		}
 
 		_, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
+			fmt.Println("round4")
 			c.Redirect(http.StatusTemporaryRedirect, a.getAuthURL())
 			return nil
 		}
 
-		c.Redirect(http.StatusTemporaryRedirect, a.getCallbackURL("", err))
+		c.Redirect(http.StatusTemporaryRedirect, a.getCallbackURL(webRedirectURL, "", err))
 		return nil
 	}
 }
@@ -164,17 +170,17 @@ func (a *Authenticator) AuthenHandler() echo.HandlerFunc {
 func (a *Authenticator) AuthenCallbackHandler(svc getEmployeeFunc, svc2 createAuthLogFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log := logger.Unwrap(c)
-
+		webRedirectURL := c.QueryParam("page")
 		claims, idToken, err := a.getCallbackToken(&c, svc)
 		if err != nil {
 			log.Error("Error authen callback", zap.Error(err))
-			c.Redirect(http.StatusTemporaryRedirect, a.getCallbackURL("", err))
+			c.Redirect(http.StatusTemporaryRedirect, a.getCallbackURL(webRedirectURL, "", err))
 			return err
 		}
 
 		token, err := claims.getToken(config.AuthJWTExpiredDuration)
 		if err != nil {
-			c.Redirect(http.StatusTemporaryRedirect, a.getCallbackURL("", err))
+			c.Redirect(http.StatusTemporaryRedirect, a.getCallbackURL(webRedirectURL, "", err))
 			return err
 		}
 
@@ -199,7 +205,7 @@ func (a *Authenticator) AuthenCallbackHandler(svc getEmployeeFunc, svc2 createAu
 		// newCookie.Domain = config.AppURL
 		// c.SetCookie(newCookie)
 
-		return c.Redirect(http.StatusTemporaryRedirect, a.getCallbackURL(token, nil))
+		return c.Redirect(http.StatusTemporaryRedirect, a.getCallbackURL(webRedirectURL, token, nil))
 	}
 }
 
