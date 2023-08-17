@@ -24,11 +24,6 @@ func GetProgressReport(db *connection.DBConnection) getProgressReportFunc {
 func (spec *ProgressReportSearch) search(db *gorm.DB, id *uint) (ProgressReportDBs, int64, error) {
 	var lod ProgressReportDBs
 
-	// jobIDs := spec.getSearchCriteriaIDs(db)
-	// if jobIDs != nil && len(*jobIDs) == 0 {
-	// 	return boqItems, 0, nil
-	// }
-
 	countDB := db.Model(&lod)
 	countDB = countDB.Where("CONTRACT_ID = ?", id)
 	countDB, err := spec.buildSearch(countDB)
@@ -53,27 +48,27 @@ func (spec *ProgressReportSearch) buildSearch(db *gorm.DB) (*gorm.DB, error) {
 
 	// db = db.Where("BOQ_ID = ?", id).Order("ID DESC")
 	if spec.SequencesNo != "" {
-		db = db.Where("SEQ_NO LIKE ?", spec.SequencesNo+"%")
+		db = db.Where("SEQ_NO LIKE ?", "%"+spec.SequencesNo+"%")
 	}
 
 	if spec.Invoice != "" {
-		db = db.Where("CONTRACTOR_INV_NO LIKE ?", spec.Invoice+"%")
+		db = db.Where("CONTRACTOR_INV_NO LIKE ?", "%"+spec.Invoice+"%")
 	}
 
 	if spec.ItemName != "" {
-		db = db.Where("BOQ_ITEM_NAME LIKE ?", spec.ItemName+"%")
+		db = db.Where("BOQ_ITEM_NAME LIKE ?", "%"+spec.ItemName+"%")
 	}
 
 	if spec.Arrival != "" {
-		db = db.Where("ARRIVAL_DATE_AT_SITE LIKE ?", spec.Arrival+"%")
+		db = db.Where("ARRIVAL_DATE_AT_SITE LIKE ?", "%"+spec.Arrival+"%")
 	}
 
 	if spec.Inspection != "" {
-		db = db.Where("INSPECTION_DATE LIKE ?", spec.Inspection+"%")
+		db = db.Where("INSPECTION_DATE LIKE ?", "%"+spec.Inspection+"%")
 	}
 
 	if spec.StateName != "" {
-		db = db.Where("STATE_NAME LIKE ?", spec.StateName+"%")
+		db = db.Where("STATE_NAME LIKE ?", "%"+spec.StateName+"%")
 	}
 
 	return db, db.Error
@@ -112,78 +107,72 @@ func (spec *ProgressReportSearch) buildOrder(db *gorm.DB) (*gorm.DB, error) {
 func GetCheckReport(db *connection.DBConnection) getCheckReportFunc {
 	return func(ctx context.Context, spec CheckReportSearch, id uint) (CheckReports, int64, error) {
 		var result CheckReports
-		cod, count, err := spec.search(db.CPM, &id)
+		data, count, err := spec.search(db.CPM, &id)
 
 		if err != nil {
 			return result, count, err
 		}
-		result = cod.ToResponse()
+		result = data.ToResponse()
 		return result, count, err
 	}
 
 }
 
 func (spec *CheckReportSearch) search(db *gorm.DB, id *uint) (CheckReportDBs, int64, error) {
-	var cod CheckReportDBs
+	var result CheckReportDBs
 
-	// jobIDs := spec.getSearchCriteriaIDs(db)
-	// if jobIDs != nil && len(*jobIDs) == 0 {
-	// 	return boqItems, 0, nil
-	// }
-
-	countDB := db.Model(&cod)
+	countDB := db.Model(&result)
 	countDB = countDB.Where("CONTRACT_ID = ?", id)
 	countDB, err := spec.buildSearch(countDB)
 	if err != nil {
-		return cod, 0, err
+		return result, 0, err
 	}
 	var count int64
 	if err := countDB.Count(&count).Error; err != nil {
-		return cod, 0, err
+		return result, 0, err
 	}
 
 	countDB = countDB.Offset(spec.Offset()).Limit(spec.GetLimit())
 	countDB, err = spec.buildOrder(countDB)
 	if err != nil {
-		return cod, 0, err
+		return result, 0, err
 	}
 
-	return cod, count, countDB.Find(&cod).Error
+	return result, count, countDB.Find(&result).Error
 }
 
 func (spec *CheckReportSearch) buildSearch(db *gorm.DB) (*gorm.DB, error) {
 
-	// db = db.Where("BOQ_ID = ?", id).Order("ID DESC")
 	if spec.SequencesNo != "" {
-		db = db.Where("SEQ_NO LIKE ?", spec.SequencesNo+"%")
+		db = db.Where("SEQ_NO LIKE ?", "%"+spec.SequencesNo+"%")
 	}
 
 	if spec.Invoice != "" {
-		db = db.Where("CONTRACTOR_INV_NO LIKE ?", spec.Invoice+"%")
+		db = db.Where("CONTRACTOR_INV_NO LIKE ?", "%"+spec.Invoice+"%")
 	}
 
 	if spec.ItemName != "" {
-		db = db.Where("BOQ_ITEM_NAME LIKE ?", spec.ItemName+"%")
+		db = db.Where("BOQ_ITEM_NAME LIKE ?", "%"+spec.ItemName+"%")
 	}
 
 	if spec.Arrival != "" {
-		db = db.Where("ARRIVAL_DATE_AT_SITE LIKE ?", spec.Arrival+"%")
+		db = db.Where("ARRIVAL_DATE_AT_SITE LIKE ?", "%"+spec.Arrival+"%")
 	}
 
 	if spec.Inspection != "" {
-		db = db.Where("INSPECTION_DATE LIKE ?", spec.Inspection+"%")
+		db = db.Where("INSPECTION_DATE LIKE ?", "%"+spec.Inspection+"%")
 	}
 
 	if spec.Amount != "" {
-		db = db.Where("STATE_NAME LIKE ?", spec.Amount+"%")
+		db = db.Where("DELIVERED_QTY LIKE ?", "%"+spec.Amount+"%")
 	}
 
 	if spec.Good != "" {
-		db = db.Where("STATE_NAME LIKE ?", spec.Good+"%")
+		db = db.Where("GOOD_QTY LIKE ?", "%"+spec.Good+"%")
 	}
 
 	if spec.Waste != "" {
-		db = db.Where("STATE_NAME LIKE ?", spec.Waste+"%")
+		db = db.Where("WASTE_QTY LIKE ?", "%"+spec.Waste+"%")
 	}
 
 	return db, db.Error
@@ -191,7 +180,6 @@ func (spec *CheckReportSearch) buildSearch(db *gorm.DB) (*gorm.DB, error) {
 
 func (spec *CheckReportSearch) buildOrder(db *gorm.DB) (*gorm.DB, error) {
 
-	// db = db.Where("BOQ_ID = ?", id).Order("ID DESC")
 	if spec.SortSequencesNo != "" {
 		db = db.Order("SEQ_NO " + spec.SortSequencesNo)
 	}
@@ -213,15 +201,15 @@ func (spec *CheckReportSearch) buildOrder(db *gorm.DB) (*gorm.DB, error) {
 	}
 
 	if spec.SortAmount != "" {
-		db = db.Order("STATE_NAME " + spec.SortAmount)
+		db = db.Order("DELIVERED_QTY " + spec.SortAmount)
 	}
 
 	if spec.SortGood != "" {
-		db = db.Order("STATE_NAME " + spec.SortGood)
+		db = db.Order("GOOD_QTY " + spec.SortGood)
 	}
 
 	if spec.SortWaste != "" {
-		db = db.Order("STATE_NAME " + spec.SortWaste)
+		db = db.Order("WASTE_QTY " + spec.SortWaste)
 	}
 
 	return db, db.Error

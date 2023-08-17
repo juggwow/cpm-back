@@ -40,7 +40,7 @@ func (RadDoc) TableName() string {
 
 type SearchSpec struct {
 	request.Pagination
-	SeqNo          int
+	SeqNo          string
 	InvNo          string
 	Qty            string
 	Arrival        string

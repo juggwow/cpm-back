@@ -5,6 +5,7 @@ import (
 	"cpm-rad-backend/domain/logger"
 	"cpm-rad-backend/domain/request"
 	"cpm-rad-backend/domain/response"
+	"cpm-rad-backend/domain/utils"
 	"net/http"
 	"strconv"
 
@@ -22,8 +23,8 @@ func GetHandler(svc getFunc) echo.HandlerFunc {
 		log := logger.Unwrap(c)
 
 		ID, _ := strconv.Atoi(c.Param("id"))
-		spec := ParseSearchSpec(c)
-		data, total, err := svc.Get(c.Request().Context(), spec, uint(ID))
+		search := ParseSearchSpec(c)
+		data, total, err := svc.Get(c.Request().Context(), search, uint(ID))
 		if err != nil {
 			log.Error(err.Error())
 			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
@@ -31,8 +32,8 @@ func GetHandler(svc getFunc) echo.HandlerFunc {
 
 		return c.JSON(http.StatusOK, response.Data[BoqItemList]{
 			Data:  data,
-			Page:  spec.GetPage(),
-			Limit: spec.GetLimit(),
+			Page:  search.GetPage(),
+			Limit: search.GetLimit(),
 			Total: total,
 		})
 	}
@@ -40,11 +41,11 @@ func GetHandler(svc getFunc) echo.HandlerFunc {
 
 func ParseSearchSpec(c echo.Context) SearchSpec {
 
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	limit, _ := strconv.Atoi(c.QueryParam("limit"))
-
 	return SearchSpec{
-		Pagination:        request.GetPagination(page, limit),
+		Pagination: request.GetPagination(
+			utils.StringToInt(c.QueryParam("page")),
+			utils.StringToInt(c.QueryParam("limit")),
+		),
 		SearchRowNo:       c.QueryParam("searchRowNo"),
 		SearchNumber:      c.QueryParam("searchNumber"),
 		SearchGroupName:   c.QueryParam("searchGroupName"),

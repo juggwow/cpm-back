@@ -28,8 +28,6 @@ func GetProgressReportHandler(svc getProgressReportFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
 		}
 
-		// data := progressReport.ToResponse()
-
 		return c.JSON(http.StatusOK, response.Data[ProgressReport]{
 			Data:  data,
 			Page:  search.GetPage(),
@@ -40,26 +38,24 @@ func GetProgressReportHandler(svc getProgressReportFunc) echo.HandlerFunc {
 }
 
 func ParseProgressReportSearch(c echo.Context) ProgressReportSearch {
-
-	// var employee *auth.JwtEmployeeClaims
-	// if claims, err := auth.GetAuthorizedClaims(c); err == nil {
-	// 	employee = &claims
-	// }
-
 	return ProgressReportSearch{
-		Pagination:      request.GetPagination(utils.StringToInt(c.QueryParam("page")), utils.StringToInt(c.QueryParam("limit"))),
-		SequencesNo:     c.QueryParam("seq"),
-		ItemName:        c.QueryParam("itemName"),
-		Invoice:         c.QueryParam("invNo"),
-		Arrival:         c.QueryParam("arrival"),
-		Inspection:      c.QueryParam("inspection"),
-		StateName:       c.QueryParam("stateName"),
-		SortSequencesNo: c.QueryParam("sSeq"),
-		SortItemName:    c.QueryParam("sItemName"),
-		SortInvoice:     c.QueryParam("sInvNo"),
-		SortArrival:     c.QueryParam("sArrival"),
-		SortInspection:  c.QueryParam("sInspection"),
-		SortStateName:   c.QueryParam("sStateName"),
+
+		Pagination: request.GetPagination(
+			utils.StringToInt(c.QueryParam("page")),
+			utils.StringToInt(c.QueryParam("limit")),
+		),
+		SequencesNo:     c.QueryParam("searchRowNo"),
+		ItemName:        c.QueryParam("searchItemName"),
+		Invoice:         c.QueryParam("searchInvNo"),
+		Arrival:         c.QueryParam("searchArrival"),
+		Inspection:      c.QueryParam("searchInspection"),
+		StateName:       c.QueryParam("searchStateName"),
+		SortSequencesNo: c.QueryParam("sortRowNo"),
+		SortItemName:    c.QueryParam("sortItemName"),
+		SortInvoice:     c.QueryParam("sortInvNo"),
+		SortArrival:     c.QueryParam("sortArrival"),
+		SortInspection:  c.QueryParam("sortInspection"),
+		SortStateName:   c.QueryParam("sortStateName"),
 	}
 }
 
@@ -80,8 +76,6 @@ func GetCheckReportHandler(svc getCheckReportFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
 		}
 
-		// data := progressReport.ToResponse()
-
 		return c.JSON(http.StatusOK, response.Data[CheckReport]{
 			Data:  data,
 			Page:  search.GetPage(),
@@ -99,22 +93,27 @@ func ParseCheckSearch(c echo.Context) CheckReportSearch {
 	// }
 
 	return CheckReportSearch{
-		Pagination:      request.GetPagination(utils.StringToInt(c.QueryParam("page")), utils.StringToInt(c.QueryParam("limit"))),
-		SequencesNo:     c.QueryParam("seq"),
-		ItemName:        c.QueryParam("itemName"),
-		Invoice:         c.QueryParam("invNo"),
-		Arrival:         c.QueryParam("arrival"),
-		Inspection:      c.QueryParam("inspection"),
-		Amount:          c.QueryParam("amount"),
-		Good:            c.QueryParam("good"),
-		Waste:           c.QueryParam("waste"),
-		SortSequencesNo: c.QueryParam("sSeq"),
-		SortItemName:    c.QueryParam("sItemName"),
-		SortInvoice:     c.QueryParam("sInvNo"),
-		SortArrival:     c.QueryParam("sArrival"),
-		SortInspection:  c.QueryParam("sInspection"),
-		SortAmount:      c.QueryParam("sAmount"),
-		SortGood:        c.QueryParam("sGood"),
-		SortWaste:       c.QueryParam("sWaste"),
+
+		Pagination: request.GetPagination(
+			utils.StringToInt(c.QueryParam("page")),
+			utils.StringToInt(c.QueryParam("limit")),
+		),
+		SequencesNo:     c.QueryParam("searchRowNo"),
+		ItemName:        c.QueryParam("searchItemName"),
+		Invoice:         c.QueryParam("searchInvNo"),
+		Arrival:         c.QueryParam("searchArrival"),
+		Inspection:      c.QueryParam("searchInspection"),
+		Amount:          c.QueryParam("searchAmount"),
+		Good:            c.QueryParam("searchGood"),
+		Waste:           c.QueryParam("searchWaste"),
+		SortSequencesNo: c.QueryParam("sortRowNo"),
+		SortItemName:    c.QueryParam("sortItemName"),
+		SortInvoice:     c.QueryParam("sortInvNo"),
+		SortArrival:     c.QueryParam("sortArrival"),
+		SortInspection:  c.QueryParam("sortInspection"),
+		SortAmount:      c.QueryParam("sortAmount"),
+		SortGood:        c.QueryParam("sortGood"),
+		SortWaste:       c.QueryParam("sortWaste"),
 	}
+
 }
