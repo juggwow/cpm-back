@@ -23,12 +23,11 @@ func Create(db *connection.DBConnection, m minio.Client) createFunc {
 		// getEmpByID := func(empID string) (employee.Employee, error) {
 		// 	return getEmpFromDB(ctx, empID)
 		// }
-
 		err := db.CPM.Transaction(func(tx *gorm.DB) error {
 			report := r.ToModel()
 
 			// report.RadNo = fmt.Sprintf("rad-%d", report.ItemID)
-			report.CreateBy = "createdBy"
+			// report.CreateBy = "createdBy"
 
 			if err := tx.Omit("UpdateBy", "UpdateDate", "DelFlag", "RadNo").Create(&report).Error; err != nil {
 				return err
@@ -120,7 +119,7 @@ func Update(db *connection.DBConnection, m minio.Client) updateFunc {
 
 		err := db.CPM.Transaction(func(tx *gorm.DB) error {
 			report := r.ToModel()
-			report.UpdateBy = "คนแก้ เอกสาร"
+			// report.UpdateBy = "คนแก้ เอกสาร"
 			now := time.Now()
 			report.UpdateDate = &now
 

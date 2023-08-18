@@ -38,7 +38,7 @@ type RequestReportUpdate struct {
 	Model      string `json:"model"`
 	Serial     string `json:"serial"`
 	PeaNo      string `json:"peano"`
-	CreateBy   string `json:"createby"`
+	UpdateBy   string `json:"updateBy"`
 	Status     string `json:"status"`
 }
 
@@ -95,6 +95,8 @@ func (r *RequestReportUpdate) ToModel() ReportDB {
 		Model:      r.Model,
 		Serial:     r.Serial,
 		PeaNo:      r.PeaNo,
+		UpdateBy:   r.UpdateBy,
+		UpdateDate: &time.Time{},
 		Status:     utils.StringToInt(r.Status),
 	}
 }
@@ -113,6 +115,8 @@ func (r *RequestReportCreate) ToModel() ReportDB {
 		Model:      r.Model,
 		Serial:     r.Serial,
 		PeaNo:      r.PeaNo,
+		CreateBy:   r.CreateBy,
+		UpdateDate: &time.Time{},
 		Status:     utils.StringToInt(r.Status),
 	}
 }

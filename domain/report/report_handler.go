@@ -2,6 +2,7 @@ package report
 
 import (
 	"context"
+	"cpm-rad-backend/domain/auth"
 	"cpm-rad-backend/domain/logger"
 	"cpm-rad-backend/domain/utils"
 	"encoding/json"
@@ -25,6 +26,11 @@ func CreateHandler(svc createFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log := logger.Unwrap(c)
 
+		claims, _ := auth.GetAuthorizedClaims(c)
+		log.Info(strings.Join([]string{claims.EmployeeID, claims.FirstName, claims.LastName}, " "))
+
+		// check permission
+
 		var r RequestReportCreate
 		r.ItemID = c.FormValue("itemID")
 		r.Arrival = c.FormValue("arrival")
@@ -37,7 +43,7 @@ func CreateHandler(svc createFunc) echo.HandlerFunc {
 		r.Model = c.FormValue("model")
 		r.Serial = c.FormValue("serial")
 		r.PeaNo = c.FormValue("peano")
-		r.CreateBy = c.FormValue("createby")
+		r.CreateBy = strings.Join([]string{claims.FirstName, claims.LastName}, " ") //c.FormValue("createby")
 		r.Status = c.FormValue("status")
 
 		if err := invalidRequest(&r); err != nil {
@@ -110,6 +116,9 @@ func UpdateHandler(svc updateFunc) echo.HandlerFunc {
 
 		log := logger.Unwrap(c)
 
+		claims, _ := auth.GetAuthorizedClaims(c)
+		log.Info(strings.Join([]string{claims.EmployeeID, claims.FirstName, claims.LastName}, " "))
+
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			log.Error(err.Error())
@@ -129,8 +138,8 @@ func UpdateHandler(svc updateFunc) echo.HandlerFunc {
 		r.Model = c.FormValue("model")
 		r.Serial = c.FormValue("serial")
 		r.PeaNo = c.FormValue("peano")
-		r.CreateBy = c.FormValue("createby")
 		r.Status = c.FormValue("status")
+		r.UpdateBy = strings.Join([]string{claims.FirstName, claims.LastName}, " ")
 
 		//// varidate data before update
 
