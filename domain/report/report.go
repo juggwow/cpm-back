@@ -193,7 +193,7 @@ type ResponseAttachFile struct {
 	Name     string `json:"name,omitempty" gorm:"column:FILE_NAME"`
 	Size     string `json:"size,omitempty" gorm:"column:FILE_SIZE"`
 	Unit     string `json:"unit,omitempty" gorm:"column:FILE_UNIT"`
-	TypeID   uint   `json:"typeID" gorm:"column:TYPE_ID"`
+	TypeID   uint   `json:"typeID,omitempty" gorm:"column:TYPE_ID"`
 	TypeName string `json:"typeName,omitempty" gorm:"column:TYPE_NAME"`
 }
 type ResponseAttachFiles []ResponseAttachFile
@@ -238,9 +238,19 @@ type ResponseReportDetail struct {
 	StateID     string              `json:"stateID,omitempty"`
 	StateName   string              `json:"stateName,omitempty"`
 	AttachFiles ResponseAttachFiles `json:"attachFiles,omitempty"`
+	RadFiles    ResponseAttachFile  `json:"radFile,omitempty"`
 }
 
 func (r *ReportDetailDB) ToResponse(attachFiles ResponseAttachFiles) ResponseReportDetail {
+	var radFile ResponseAttachFile
+	var attach ResponseAttachFiles
+	for _, file := range attachFiles {
+		if file.TypeID == 0 {
+			radFile = file
+		} else {
+			attach = append(attach, file)
+		}
+	}
 	res := ResponseReportDetail{
 		ID:          r.ID,
 		ItemID:      r.ItemID,
@@ -259,7 +269,8 @@ func (r *ReportDetailDB) ToResponse(attachFiles ResponseAttachFiles) ResponseRep
 		PeaNo:       r.PeaNo,
 		StateID:     r.StateID,
 		StateName:   r.StateName,
-		AttachFiles: attachFiles,
+		AttachFiles: attach,
+		RadFiles:    radFile,
 	}
 	return res
 }
