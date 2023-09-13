@@ -214,6 +214,7 @@ type ReportDetailDB struct {
 	Model      string    `gorm:"column:MODEL"`
 	Serial     string    `gorm:"column:SERIAL_NO"`
 	PeaNo      string    `gorm:"column:PEA_NO"`
+	StateID    string    `gorm:"column:STATE_ID"`
 	StateName  string    `gorm:"column:STATE_NAME"`
 }
 type MultiReportDetailDB []ReportDetailDB
@@ -234,6 +235,7 @@ type ResponseReportDetail struct {
 	Model       string              `json:"model,omitempty"`
 	Serial      string              `json:"serial,omitempty"`
 	PeaNo       string              `json:"peano,omitempty"`
+	StateID     string              `json:"stateID,omitempty"`
 	StateName   string              `json:"stateName,omitempty"`
 	AttachFiles ResponseAttachFiles `json:"attachFiles,omitempty"`
 }
@@ -255,6 +257,7 @@ func (r *ReportDetailDB) ToResponse(attachFiles ResponseAttachFiles) ResponseRep
 		Model:       r.Model,
 		Serial:      r.Serial,
 		PeaNo:       r.PeaNo,
+		StateID:     r.StateID,
 		StateName:   r.StateName,
 		AttachFiles: attachFiles,
 	}
