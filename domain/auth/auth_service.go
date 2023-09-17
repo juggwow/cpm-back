@@ -183,7 +183,7 @@ func GetAuthorizedClaims(c echo.Context) (JwtEmployeeClaims, error) {
 	return *claims, nil
 }
 
-func (a Authenticator) getLogoutURL(claims *JwtEmployeeClaims) (string, error) {
+func (a Authenticator) getLogoutURL(claims *JwtEmployeeClaims, webRedirectURL string) (string, error) {
 	path, err := url.JoinPath(config.AuthURL, "/protocol/openid-connect/logout")
 	if err != nil {
 		return "", err
@@ -202,7 +202,7 @@ func (a Authenticator) getLogoutURL(claims *JwtEmployeeClaims) (string, error) {
 	// #
 
 	q := urlInfo.Query()
-	q.Set("post_logout_redirect_uri", config.AppURL+"/auth")
+	q.Set("post_logout_redirect_uri", config.AppURL+"/auth"+"?page="+webRedirectURL)
 	// #SSO2 comment This
 	//q.Set("id_token_hint", string(idToken))
 	// #
