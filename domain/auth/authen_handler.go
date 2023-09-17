@@ -275,7 +275,7 @@ func (a Authenticator) GetRefreshTokenHandler() echo.HandlerFunc {
 func (a Authenticator) LogoutHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		logger.Unwrap(c)
-
+		webRedirectURL := c.QueryParam("page")
 		// parser := &jwt.Parser{
 		// 	SkipClaimsValidation: true,
 		// }
@@ -285,7 +285,7 @@ func (a Authenticator) LogoutHandler() echo.HandlerFunc {
 		claims := &JwtEmployeeClaims{}
 		parser.ParseWithClaims(c.Param("token"), claims, getSecretKey)
 
-		logoutURL, err := a.getLogoutURL(claims)
+		logoutURL, err := a.getLogoutURL(claims, webRedirectURL)
 		if err != nil {
 			return err
 		}
