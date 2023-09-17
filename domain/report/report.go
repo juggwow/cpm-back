@@ -362,15 +362,15 @@ func (items *DbAttachImages) ToResponseSrc() []Image {
 type ResponseComment struct {
 	OverAll      string  `json:"overAll,omitempty"`
 	Problem      Problem `json:"problem,omitempty"`
-	NoProblem    uint    `json:"noProblem,omitempty"`
+	NoProblem    uint    `json:"noProblem"`
 	Images       []Image `json:"images,omitempty"`
 	ExtraComment string  `json:"extraComment,omitempty"`
 }
 
 type Problem struct {
-	Defect     uint `json:"defect,omitempty"`
-	Incomplate uint `json:"incomplate,omitempty"`
-	Mismatch   uint `json:"mismatch,omitempty"`
+	Defect     uint `json:"defect"`
+	Incomplate uint `json:"incomplate"`
+	Mismatch   uint `json:"mismatch"`
 }
 
 type Image struct {
