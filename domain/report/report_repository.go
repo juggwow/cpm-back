@@ -104,7 +104,7 @@ func Get(db *connection.DBConnection) getFunc {
 		}
 
 		var images DbAttachImages
-		err = db.CPM.Select("Name").Where("RAD_ID = ? AND DEL_FLAG = ?", result.ID, "N").Find(&images).Error
+		err = db.CPM.Select("Path").Where("RAD_ID = ? AND DEL_FLAG = ?", result.ID, "N").Find(&images).Error
 		if err != nil {
 			return res, err
 		}

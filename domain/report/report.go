@@ -346,7 +346,7 @@ func (DbAttachImage) TableName() string {
 
 func (item *DbAttachImage) ToResponseSrc() Image {
 	res := Image{
-		Src: config.AppURL + "/image/" + item.Name,
+		Src: config.AppURL + "/image/" + item.Path,
 	}
 	return res
 }

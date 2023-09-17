@@ -152,6 +152,8 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 	e.GET("/healths", health_check.HealthCheck)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
+	e.GET("/image/:itemid/:reportid/:filename", minio.DownloadHandler())
+
 	if authenticator, err := auth.NewAuthenticator(); err == nil {
 		e.GET("/auth", authenticator.AuthenHandler())
 		e.GET("/auth/callback", authenticator.AuthenCallbackHandler(employee.GetAndCreateIfNotExist(db), auth.CreateLog(db)))

@@ -3,12 +3,15 @@ package minio
 import (
 	"context"
 	"cpm-rad-backend/domain/config"
+	"cpm-rad-backend/domain/logger"
 	"fmt"
 	"log"
 	"mime/multipart"
+	"net/http"
 	"path/filepath"
 	"strings"
 
+	"github.com/labstack/echo/v4"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/xid"
@@ -76,6 +79,28 @@ func (m *client) Upload(ctx context.Context, file *multipart.FileHeader, floder 
 	log.Printf("%#v\n", info)
 
 	return &info, objectName, err
+}
+
+func DownloadHandler() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.Unwrap(c)
+
+		objectName := c.Param("itemid") + "/" + c.Param("reportid") + "/" + c.Param("filename")
+		ext := filepath.Ext(objectName)
+
+		obj, err := minioClient.GetObject(
+			c.Request().Context(),
+			config.StorageBucketName,
+			objectName,
+			minio.GetObjectOptions{},
+		)
+		if err != nil {
+			fmt.Println(err)
+			return c.NoContent(500)
+		}
+		defer obj.Close()
+		return c.Stream(http.StatusOK, getContentType(ext), obj)
+	}
 }
 
 func (m *client) Download(ctx context.Context, filename string) (*minio.Object, string, error) {
