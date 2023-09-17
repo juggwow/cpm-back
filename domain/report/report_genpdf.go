@@ -20,6 +20,7 @@ type ReportPdfdata struct {
 }
 
 type ReportPdfDB struct {
+	ID           int    `gorm:"column:ID"`
 	Inspection   string `gorm:"column:INSPECTION_DATE"`
 	Project      string `gorm:"column:PROJECT_NAME"`
 	Station      string `gorm:"column:WORK_NAME"`
@@ -33,11 +34,13 @@ type ReportPdfDB struct {
 	ItemName     string `gorm:"column:NAME"`
 	ItemUnit     string `gorm:"column:UNIT"`
 }
+type ReportPdfDBs []ReportPdfDB
 
 type FileAttachmentDB struct {
-	ID   int    `gorm:"column:ID"`
-	Name string `gorm:"column:FILE_NAME"`
-	Type string `gorm:"column:FILE_TYPE"`
+	ReportID int    `gorm:"column:RAD_ID"`
+	ID       int    `gorm:"column:ID"`
+	Name     string `gorm:"column:FILE_NAME"`
+	Type     string `gorm:"column:FILE_TYPE"`
 }
 
 type FileAttachmentDBs []FileAttachmentDB
