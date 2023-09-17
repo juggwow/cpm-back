@@ -1,6 +1,7 @@
 package report
 
 import (
+	"cpm-rad-backend/domain/config"
 	"cpm-rad-backend/domain/utils"
 	"mime/multipart"
 	"time"
@@ -199,23 +200,28 @@ type ResponseAttachFile struct {
 type ResponseAttachFiles []ResponseAttachFile
 
 type ReportDetailDB struct {
-	ID         uint      `gorm:"column:ID"`
-	ItemID     uint      `gorm:"column:ITEM_ID"`
-	ItemName   string    `gorm:"column:ITEM_NAME"`
-	ItemUnit   string    `gorm:"column:ITEM_UNIT"`
-	RadNo      string    `gorm:"column:RAD_NO"`
-	Arrival    time.Time `gorm:"column:ARRIVAL_DATE_AT_SITE"`
-	Inspection time.Time `gorm:"column:INSPECTION_DATE"`
-	TaskMaster string    `gorm:"column:NAME_OF_TASKMASTER"`
-	Invoice    string    `gorm:"column:CONTRACTOR_INV_NO"`
-	Quantity   uint      `gorm:"column:QUANTITY"`
-	Country    string    `gorm:"column:COUNTRY"`
-	Brand      string    `gorm:"column:MANUFACTURER"`
-	Model      string    `gorm:"column:MODEL"`
-	Serial     string    `gorm:"column:SERIAL_NO"`
-	PeaNo      string    `gorm:"column:PEA_NO"`
-	StateID    string    `gorm:"column:STATE_ID"`
-	StateName  string    `gorm:"column:STATE_NAME"`
+	ID                 uint      `gorm:"column:ID"`
+	ItemID             uint      `gorm:"column:ITEM_ID"`
+	ItemName           string    `gorm:"column:ITEM_NAME"`
+	ItemUnit           string    `gorm:"column:ITEM_UNIT"`
+	RadNo              string    `gorm:"column:RAD_NO"`
+	Arrival            time.Time `gorm:"column:ARRIVAL_DATE_AT_SITE"`
+	Inspection         time.Time `gorm:"column:INSPECTION_DATE"`
+	TaskMaster         string    `gorm:"column:NAME_OF_TASKMASTER"`
+	Invoice            string    `gorm:"column:CONTRACTOR_INV_NO"`
+	Quantity           uint      `gorm:"column:QUANTITY"`
+	Country            string    `gorm:"column:COUNTRY"`
+	Brand              string    `gorm:"column:MANUFACTURER"`
+	Model              string    `gorm:"column:MODEL"`
+	Serial             string    `gorm:"column:SERIAL_NO"`
+	PeaNo              string    `gorm:"column:PEA_NO"`
+	StateID            string    `gorm:"column:STATE_ID"`
+	StateName          string    `gorm:"column:STATE_NAME"`
+	Remark             string    `gorm:"column:REMARK"`
+	ReceiveQuantity    uint      `gorm:"column:RECEIVE_QUANTITY"`
+	DefectQuantity     uint      `gorm:"column:DEFECT_QUANTITY"`
+	InCompleteQuantity uint      `gorm:"column:INCOMPLETE_QUANTITY"`
+	MismatchQuantity   uint      `gorm:"column:MISMATCH_QUANTITY"`
 }
 type MultiReportDetailDB []ReportDetailDB
 
@@ -239,9 +245,10 @@ type ResponseReportDetail struct {
 	StateName   string              `json:"stateName,omitempty"`
 	AttachFiles ResponseAttachFiles `json:"attachFiles,omitempty"`
 	RadFiles    ResponseAttachFile  `json:"radFile,omitempty"`
+	Comment     ResponseComment     `json:"comment,omitempty"`
 }
 
-func (r *ReportDetailDB) ToResponse(attachFiles ResponseAttachFiles) ResponseReportDetail {
+func (r *ReportDetailDB) ToResponse(attachFiles ResponseAttachFiles, attachImages DbAttachImages) ResponseReportDetail {
 	var radFile ResponseAttachFile
 	var attach ResponseAttachFiles
 	for _, file := range attachFiles {
@@ -251,6 +258,7 @@ func (r *ReportDetailDB) ToResponse(attachFiles ResponseAttachFiles) ResponseRep
 			attach = append(attach, file)
 		}
 	}
+
 	res := ResponseReportDetail{
 		ID:          r.ID,
 		ItemID:      r.ItemID,
@@ -271,6 +279,22 @@ func (r *ReportDetailDB) ToResponse(attachFiles ResponseAttachFiles) ResponseRep
 		StateName:   r.StateName,
 		AttachFiles: attach,
 		RadFiles:    radFile,
+		Comment:     r.ToResponseComment(attachImages),
+	}
+	return res
+}
+
+func (r *ReportDetailDB) ToResponseComment(attachImages DbAttachImages) ResponseComment {
+	res := ResponseComment{
+		OverAll: utils.IfThenElse((r.DefectQuantity+r.InCompleteQuantity+r.MismatchQuantity) > 0, "พบปัญหา", "รับของเรียบร้อย").(string),
+		Problem: Problem{
+			Defect:     r.DefectQuantity,
+			Incomplate: r.InCompleteQuantity,
+			Mismatch:   r.MismatchQuantity,
+		},
+		NoProblem:    r.ReceiveQuantity,
+		Images:       attachImages.ToResponseSrc(),
+		ExtraComment: r.Remark,
 	}
 	return res
 }
@@ -299,4 +323,56 @@ type FileResponse struct {
 	Obj  []byte
 	Ext  string
 	Name string
+}
+
+type DbAttachImage struct {
+	ID         uint            `gorm:"column:ID"`
+	ReportID   uint            `gorm:"column:RAD_ID"`
+	Name       string          `gorm:"column:FILE_NAME"`
+	Size       decimal.Decimal `gorm:"column:FILE_SIZE"`
+	Unit       string          `gorm:"column:FILE_UNIT"`
+	Path       string          `gorm:"column:FILE_PATH"`
+	CreateBy   string          `gorm:"column:CREATED_BY"`
+	UpdateBy   string          `gorm:"column:UPDATED_BY"`
+	UpdateDate *time.Time      `gorm:"column:UPDATED_DATE"`
+	DelFlag    string          `gorm:"column:DEL_FLAG"`
+}
+
+type DbAttachImages []DbAttachImage
+
+func (DbAttachImage) TableName() string {
+	return "CPM.RAD_ATTACH_PHOTO"
+}
+
+func (item *DbAttachImage) ToResponseSrc() Image {
+	res := Image{
+		Src: config.AppURL + "/image/" + item.Name,
+	}
+	return res
+}
+
+func (items *DbAttachImages) ToResponseSrc() []Image {
+	res := make([]Image, len(*items))
+	for i, item := range *items {
+		res[i] = item.ToResponseSrc()
+	}
+	return res
+}
+
+type ResponseComment struct {
+	OverAll      string  `json:"overAll,omitempty"`
+	Problem      Problem `json:"problem,omitempty"`
+	NoProblem    uint    `json:"noProblem,omitempty"`
+	Images       []Image `json:"images,omitempty"`
+	ExtraComment string  `json:"extraComment,omitempty"`
+}
+
+type Problem struct {
+	Defect     uint `json:"defect,omitempty"`
+	Incomplate uint `json:"incomplate,omitempty"`
+	Mismatch   uint `json:"mismatch,omitempty"`
+}
+
+type Image struct {
+	Src string `json:"src,omitempty"`
 }

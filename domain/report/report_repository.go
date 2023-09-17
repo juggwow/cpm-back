@@ -87,7 +87,7 @@ func Get(db *connection.DBConnection) getFunc {
 		var result ReportDetailDB
 
 		cpm := db.CPM.Model(&result)
-		err := cpm.Table("CPM.GetReportDetail(?)", id).
+		err := cpm.Table("CPM.GET_REPORT_DETAIL(?)", id).
 			Scan(&result).
 			Error
 		if err != nil {
@@ -103,7 +103,13 @@ func Get(db *connection.DBConnection) getFunc {
 			return res, err
 		}
 
-		res = result.ToResponse(files)
+		var images DbAttachImages
+		err = db.CPM.Select("Name").Where("RAD_ID = ? AND DEL_FLAG = ?", result.ID, "N").Find(&images).Error
+		if err != nil {
+			return res, err
+		}
+
+		res = result.ToResponse(files, images)
 		return res, err
 	}
 }
