@@ -45,6 +45,7 @@ func InitConfig() {
 	viper.SetDefault("auth.client.id", "CMDC")
 	viper.SetDefault("auth.client.secret", "c31bfd34-5de8-4630-a667-9864c02ae455")
 	viper.SetDefault("auth.url", "https://sso.pea.co.th/auth/realms/idm")
+
 	viper.SetDefault("auth.jwt.key", "rad-token")
 	viper.SetDefault("auth.jwt.secret", "super-secret")
 	viper.SetDefault("auth.state", "state")
