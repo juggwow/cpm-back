@@ -168,9 +168,9 @@ func initPublicAPI(e *echo.Echo, db *connection.DBConnection, minioClient minio.
 }
 
 func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.Client) {
-	if config.AuthJWTEnabled {
-		api.Use(getAuthMiddleware())
-	}
+	// if config.AuthJWTEnabled {
+	// 	api.Use(getAuthMiddleware())
+	// }
 	api.GET("/employees/me", auth.GetCurrentHandler)
 	api.GET("/employees/:employeeId", employee.GetByIDHandler(employee.GetByID(db)))
 
