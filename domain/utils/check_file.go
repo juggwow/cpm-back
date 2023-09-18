@@ -6,7 +6,7 @@ import (
 	"mime/multipart"
 )
 
-func IsPdf(files []*multipart.FileHeader) error {
+func IsValidPdf(files []*multipart.FileHeader) error {
 	// const LIMIT int64 = 52428800
 	for _, file := range files {
 		if (file.Header["Content-Type"][0] != "application/pdf") && (config.FILE_SIZE_LIMIT < file.Size) {
