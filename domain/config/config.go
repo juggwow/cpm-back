@@ -57,7 +57,7 @@ func InitConfig() {
 
 	viper.SetDefault("dito.endpoint", "http://172.30.211.224:42/api/pdf-producer/")
 
-	viper.SetDefault("auth.jwt.enabled", false)
+	viper.SetDefault("auth.jwt.enabled", true)
 	viper.SetDefault("storage.ssl", true)
 
 	viper.SetConfigName("config")
