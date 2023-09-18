@@ -51,7 +51,7 @@ func GenPdfMultiReportHandler(svc GenPdfMultiReportFunc) echo.HandlerFunc {
 		reportIDs := c.QueryParam("report")
 		if reportIDs == "" {
 			// log.Error(err.Error())
-			return c.String(http.StatusBadRequest, fmt.Sprintf("Not found report request"))
+			return c.String(http.StatusBadRequest, "Not found report request")
 		}
 
 		res, err := svc.GenPdfMultiReport(c.Request().Context(), reportIDs)
