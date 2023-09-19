@@ -232,6 +232,20 @@ func UpdateDeliveryNumber(db *connection.DBConnection) updateDeliveryNumberFunc 
 	}
 }
 
+func UpdateEquipmentDetails(db *connection.DBConnection) updateEquipmentDetailsFunc {
+	return func(ctx context.Context, req RequestReportUpdate) (ResponseReportDetail, error) {
+		var res ResponseReportDetail
+		data := req.ToModel()
+		now := time.Now()
+		data.UpdateDate = &now
+		if err := db.CPM.Select("Quantity", "Country", "Brand", "Model", "Serial", "PeaNo", "UpdateBy", "UpdateDate").Updates(&data).Error; err != nil {
+			return res, err
+		}
+		res = data.ToResponse(ResponseAttachFiles{})
+		return res, nil
+	}
+}
+
 func uploadFileToMinio(m minio.Client, ctx context.Context, file *multipart.FileHeader, report ReportDB, docType string) (FileDetail, bool, error) {
 	info, objectName, err := m.Upload(ctx, file, fmt.Sprintf("%d/%d", report.ItemID, report.ID))
 	if err != nil {
