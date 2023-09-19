@@ -5,16 +5,21 @@ type ContractRequest struct {
 }
 
 type ContractResponse struct {
-	ContractID uint   `json:"contractID"`
-	WorkID     uint   `json:"workID"`
-	Name       string `json:"name"`
+	ContractID       uint   `json:"contractID"`
+	WorkID           uint   `json:"workID"`
+	WorkName         string `json:"workName"`
+	WorkType         string `json:"workType"`
+	ProjectName      string `json:"projectName"`
+	ProjectShortName string `json:"projectShortName"`
 }
 
 type Contract struct {
-	ContractID uint   `gorm:"column:WORK_CONTRACT_ID"`
-	WorkID     uint   `gorm:"column:WORK_ID"`
-	WorkName   string `gorm:"column:WORK_NAME"`
-	WorkType   string `gorm:"column:WORK_TYPE"`
+	ContractID       uint   `gorm:"column:WORK_CONTRACT_ID"`
+	WorkID           uint   `gorm:"column:WORK_ID"`
+	WorkName         string `gorm:"column:WORK_NAME"`
+	WorkType         string `gorm:"column:WORK_TYPE"`
+	ProjectName      string `gorm:"column:PROJECT_NAME"`
+	ProjectShortName string `gorm:"column:PROJECT_SHORT_NAME"`
 }
 
 func (Contract) TableName() string {
@@ -23,9 +28,12 @@ func (Contract) TableName() string {
 
 func (contract *Contract) ToResponse() ContractResponse {
 	responses := ContractResponse{
-		ContractID: contract.ContractID,
-		WorkID:     contract.WorkID,
-		Name:       contract.WorkType + " " + contract.WorkName,
+		ContractID:       contract.ContractID,
+		WorkID:           contract.WorkID,
+		WorkName:         contract.WorkName,
+		WorkType:         contract.WorkType,
+		ProjectName:      contract.ProjectName,
+		ProjectShortName: contract.ProjectShortName,
 	}
 	return responses
 }
