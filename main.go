@@ -203,4 +203,6 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 
 	api.GET("/boq-item/:id", boqItem.GetHandler(boqItem.Get(db)))
 
+	api.POST("/upload-pdfsign/:itemid/:reportid", minio.UploadHandler(db))
+
 }

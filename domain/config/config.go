@@ -33,6 +33,8 @@ var StorageBucketName string
 var DitoApi string
 var DBCon string
 
+const FILE_SIZE_LIMIT int64 = 52428800
+
 func InitConfig() {
 	viper.SetDefault("app.url", "http://localhost:8000")
 	viper.SetDefault("app.port", "8000")
