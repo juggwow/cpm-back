@@ -223,3 +223,43 @@ func invalidFile(files []*multipart.FileHeader) error {
 	}
 	return nil
 }
+
+type updateBasicDetailsFunc func(context.Context, RequestReportUpdate) (ResponseReportDetail, error)
+
+func (fn updateBasicDetailsFunc) UpdateBasicDetails(ctx context.Context, req RequestReportUpdate) (ResponseReportDetail, error) {
+	return fn(ctx, req)
+}
+
+func UpdateBasicDetailsHandler(svc updateBasicDetailsFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		log := logger.Unwrap(c)
+
+		claims, _ := auth.GetAuthorizedClaims(c)
+		log.Info(strings.Join([]string{claims.EmployeeID, claims.FirstName, claims.LastName}, " "))
+
+		reportID, err := strconv.Atoi(c.Param("reportid"))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
+		}
+
+		var req RequestReportUpdate
+		err = c.Bind(&req)
+		if err != nil {
+			log.Error("can not bind data")
+			return c.JSON(http.StatusBadRequest, utils.Reaponse{Msg: "bad request"})
+		}
+		req.ID = uint(reportID)
+		req.UpdateBy = claims.EmployeeID
+
+		res, err := svc.UpdateBasicDetails(c.Request().Context(), req)
+
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusInternalServerError, utils.ReaponseError{Error: err.Error()})
+		}
+
+		return c.JSON(http.StatusCreated, res)
+	}
+}
