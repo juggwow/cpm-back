@@ -2,19 +2,25 @@ package minio
 
 import (
 	"context"
+	"cpm-rad-backend/domain/auth"
 	"cpm-rad-backend/domain/config"
+	"cpm-rad-backend/domain/connection"
 	"cpm-rad-backend/domain/logger"
+	"cpm-rad-backend/domain/utils"
 	"fmt"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"github.com/inhies/go-bytesize"
 	"github.com/labstack/echo/v4"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/xid"
+	"github.com/shopspring/decimal"
 )
 
 var (
@@ -32,6 +38,23 @@ type Configuration struct {
 
 type client struct {
 	client *minio.Client
+}
+
+type DbRadPdfSign struct {
+	ID         uint            `gorm:"column:ID"`
+	ReportID   uint            `gorm:"column:RAD_ID"`
+	Name       string          `gorm:"column:FILE_NAME"`
+	Size       decimal.Decimal `gorm:"column:FILE_SIZE"`
+	Unit       string          `gorm:"column:FILE_UNIT"`
+	Path       string          `gorm:"column:FILE_PATH"`
+	CreateBy   string          `gorm:"column:CREATED_BY"`
+	UpdateBy   string          `gorm:"column:UPDATED_BY"`
+	UpdateDate *time.Time      `gorm:"column:UPDATED_DATE"`
+	DelFlag    string          `gorm:"column:DEL_FLAG"`
+}
+
+func (DbRadPdfSign) TableName() string {
+	return "CPM.RAD_FILE_SIGNATURE"
 }
 
 func NewConnection(config Configuration) (err error) {
@@ -55,6 +78,69 @@ type Client interface {
 	Upload(ctx context.Context, file *multipart.FileHeader, floder string) (*minio.UploadInfo, string, error)
 	Delete(ctx context.Context, filename string, itemID uint) error
 	Download(ctx context.Context, filename string) (*minio.Object, string, error)
+}
+
+func UploadHandler(db *connection.DBConnection) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+		claims, _ := auth.GetAuthorizedClaims(c)
+		log.Info(strings.Join([]string{claims.EmployeeID, claims.FirstName, claims.LastName}, " "))
+		reportid := c.Param("reportid")
+
+		floder := fmt.Sprintf("%s/%s", c.Param("itemid"), reportid)
+
+		form, _ := c.MultipartForm()
+		files := form.File["upload"]
+
+		if err := utils.IsValidPdf(files); err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusBadRequest, utils.ReaponseError{Error: err.Error()})
+		}
+
+		for _, file := range files {
+			b := bytesize.New(float64(file.Size))
+			displaySize := b.Format("%.2f ", "", false)
+			words := strings.Fields(displaySize)
+			size, _ := decimal.NewFromString(words[0])
+
+			fileName := xid.New().String() + "_" + filepath.Clean(file.Filename)
+			objectName := fmt.Sprintf("%s/%s", floder, fileName)
+
+			data := DbRadPdfSign{
+				ReportID: utils.StringToUint(reportid),
+				Name:     file.Filename,
+				Size:     size,
+				Unit:     words[1],
+				Path:     objectName,
+				CreateBy: claims.EmployeeID,
+			}
+
+			if err := db.CPM.Omit("UpdateBy", "UpdateDate", "DelFlag").Create(&data).Error; err != nil {
+				return err
+			}
+
+			src, err := file.Open()
+			if err != nil {
+				return err
+			}
+			defer src.Close()
+
+			info, err := minioClient.PutObject(c.Request().Context(),
+				config.StorageBucketName,
+				objectName,
+				src,
+				-1,
+				minio.PutObjectOptions{})
+
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, utils.ReaponseError{Error: err.Error()})
+			}
+
+			log.Info(fmt.Sprintf("%#v\n", info))
+		}
+
+		return c.JSON(http.StatusCreated, utils.Reaponse{Msg: "Upload File Success"})
+	}
 }
 
 func (m *client) Upload(ctx context.Context, file *multipart.FileHeader, floder string) (*minio.UploadInfo, string, error) {
