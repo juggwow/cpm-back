@@ -208,7 +208,23 @@ func UpdateBasicDetails(db *connection.DBConnection) updateBasicDetailsFunc {
 	return func(ctx context.Context, req RequestReportUpdate) (ResponseReportDetail, error) {
 		var res ResponseReportDetail
 		data := req.ToModel()
-		if err := db.CPM.Select("Arrival", "Inspection", "TaskMaster").Updates(&data).Error; err != nil {
+		now := time.Now()
+		data.UpdateDate = &now
+		if err := db.CPM.Select("Arrival", "Inspection", "TaskMaster", "UpdateBy", "UpdateDate").Updates(&data).Error; err != nil {
+			return res, err
+		}
+		res = data.ToResponse(ResponseAttachFiles{})
+		return res, nil
+	}
+}
+
+func UpdateDeliveryNumber(db *connection.DBConnection) updateDeliveryNumberFunc {
+	return func(ctx context.Context, req RequestReportUpdate) (ResponseReportDetail, error) {
+		var res ResponseReportDetail
+		data := req.ToModel()
+		now := time.Now()
+		data.UpdateDate = &now
+		if err := db.CPM.Select("Invoice", "UpdateBy", "UpdateDate").Updates(&data).Error; err != nil {
 			return res, err
 		}
 		res = data.ToResponse(ResponseAttachFiles{})
