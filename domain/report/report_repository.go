@@ -204,6 +204,18 @@ func Update(db *connection.DBConnection, m minio.Client) updateFunc {
 	}
 }
 
+func UpdateBasicDetails(db *connection.DBConnection) updateBasicDetailsFunc {
+	return func(ctx context.Context, req RequestReportUpdate) (ResponseReportDetail, error) {
+		var res ResponseReportDetail
+		data := req.ToModel()
+		if err := db.CPM.Select("Arrival", "Inspection", "TaskMaster").Updates(&data).Error; err != nil {
+			return res, err
+		}
+		res = data.ToResponse(ResponseAttachFiles{})
+		return res, nil
+	}
+}
+
 func uploadFileToMinio(m minio.Client, ctx context.Context, file *multipart.FileHeader, report ReportDB, docType string) (FileDetail, bool, error) {
 	info, objectName, err := m.Upload(ctx, file, fmt.Sprintf("%d/%d", report.ItemID, report.ID))
 	if err != nil {
