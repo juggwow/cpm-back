@@ -184,6 +184,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 
 	api.POST("/report", report.CreateHandler(report.Create(db, minioClient)))
 	api.GET("/report/:id", report.GetHandler(report.Get(db)))
+	api.GET("/report/:id", report.GetHandler(report.Get(db)))
 	api.PUT("/report/:id", report.UpdateHandler(report.Update(db, minioClient)))
 	api.PUT("/report-basic-details/:reportid", report.UpdateBasicDetailsHandler(report.UpdateBasicDetails(db)))
 	api.PUT("/report-delivery-number/:reportid", report.UpdateDeliveryNumberHandler(report.UpdateDeliveryNumber(db)))
@@ -204,6 +205,7 @@ func initAPIV1(api *echo.Group, db *connection.DBConnection, minioClient minio.C
 	api.GET("/listofdoc/:itemid", raddoc.GetByItemHandler(raddoc.GetByItem(db)))
 	api.GET("/listofdoc/progress/contract/:id", report.GetProgressReportHandler(report.GetProgressReport(db)))
 	api.GET("/listofdoc/check/contract/:id", report.GetCheckReportHandler(report.GetCheckReport(db)))
+	api.GET("/report/wait-for-approv/:contractid", report.GetWaitForApprovReportHandler(report.GetWaitForApprovReport(db)))
 
 	api.GET("/boq-item/:id", boqItem.GetHandler(boqItem.Get(db)))
 
