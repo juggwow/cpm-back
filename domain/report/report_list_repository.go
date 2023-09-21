@@ -214,3 +214,107 @@ func (spec *CheckReportSearch) buildOrder(db *gorm.DB) (*gorm.DB, error) {
 
 	return db, db.Error
 }
+
+func GetWaitForApprovReport(db *connection.DBConnection) getWaitForApprovReportFunc {
+	return func(ctx context.Context, spec SearchSortWaitForApprovReport, contractID uint) (ResponseReportList, int64, error) {
+		var resp ResponseReportList
+		data, count, err := spec.search(db.CPM, &contractID)
+
+		if err != nil {
+			return resp, count, err
+		}
+		resp = data.ToResponse()
+		return resp, count, err
+	}
+
+}
+
+func (spec *SearchSortWaitForApprovReport) search(db *gorm.DB, contractID *uint) (DbWaitForApprovReports, int64, error) {
+	var data DbWaitForApprovReports
+
+	countDB := db.Model(&data)
+	countDB = countDB.Table("CPM.GET_REPORT_WAIT_FOR_APPROVAL(?)", contractID)
+	// countDB = countDB.Where("CONTRACT_ID = ?", contractID)
+	countDB, err := spec.buildSearch(countDB)
+	if err != nil {
+		return data, 0, err
+	}
+	var count int64
+	if err := countDB.Count(&count).Error; err != nil {
+		return data, 0, err
+	}
+
+	countDB = countDB.Offset(spec.Offset()).Limit(spec.GetLimit())
+	countDB, err = spec.buildOrder(countDB)
+	if err != nil {
+		return data, 0, err
+	}
+
+	return data, count, countDB.Find(&data).Error
+}
+
+func (spec *SearchSortWaitForApprovReport) buildSearch(db *gorm.DB) (*gorm.DB, error) {
+
+	if spec.SequencesNo != "" {
+		db = db.Where("SEQ_NO LIKE ?", "%"+spec.SequencesNo+"%")
+	}
+
+	if spec.DeliveryNumber != "" {
+		db = db.Where("DELIVERY_NUMBER LIKE ?", "%"+spec.DeliveryNumber+"%")
+	}
+
+	if spec.ItemName != "" {
+		db = db.Where("ITEM_NAME LIKE ?", "%"+spec.ItemName+"%")
+	}
+
+	if spec.WorkName != "" {
+		db = db.Where("WORK_NAME LIKE ?", "%"+spec.WorkName+"%")
+	}
+
+	if spec.ProjectShortName != "" {
+		db = db.Where("PROJECT_SHORT_NAME LIKE ?", "%"+spec.ProjectShortName+"%")
+	}
+
+	if spec.Arrival != "" {
+		db = db.Where("ARRIVAL_DATE LIKE ?", "%"+spec.Arrival+"%")
+	}
+
+	if spec.Inspection != "" {
+		db = db.Where("INSPECTION_DATE LIKE ?", "%"+spec.Inspection+"%")
+	}
+
+	return db, db.Error
+}
+
+func (spec *SearchSortWaitForApprovReport) buildOrder(db *gorm.DB) (*gorm.DB, error) {
+
+	if spec.SortSequencesNo != "" {
+		db = db.Order("SEQ_NO " + spec.SortSequencesNo)
+	}
+
+	if spec.SortDeliveryNumber != "" {
+		db = db.Order("DELIVERY_NUMBER " + spec.SortDeliveryNumber)
+	}
+
+	if spec.SortItemName != "" {
+		db = db.Order("ITEM_NAME " + spec.SortItemName)
+	}
+
+	if spec.SortWorkName != "" {
+		db = db.Order("WORK_NAME " + spec.SortWorkName)
+	}
+
+	if spec.SortProjectShortName != "" {
+		db = db.Order("PROJECT_SHORT_NAME " + spec.SortProjectShortName)
+	}
+
+	if spec.SortArrival != "" {
+		db = db.Order("ARRIVAL_DATE " + spec.SortArrival)
+	}
+
+	if spec.SortInspection != "" {
+		db = db.Order("INSPECTION_DATE " + spec.SortInspection)
+	}
+
+	return db, db.Error
+}

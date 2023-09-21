@@ -156,3 +156,77 @@ func checkZero(value uint, unit string) string {
 	}
 	return fmt.Sprintf("%v %v", value, unit)
 }
+
+type ResponseReport struct {
+	Seq              uint       `json:"seq"`
+	ID               uint       `json:"id"`
+	DeliveryNumber   string     `json:"deliveryNumber,omitempty"`
+	WorkName         string     `json:"workName,omitempty"`
+	ProjectShortName string     `json:"projectShortName,omitempty"`
+	ItemID           uint       `json:"itemID,omitempty"`
+	ItemName         string     `json:"itemName,omitempty"`
+	ArrivalDate      utils.Time `json:"arrival,omitempty"`
+	InspectionDate   utils.Time `json:"inspection,omitempty"`
+	StateID          uint       `json:"stateID,omitempty"`
+	StateName        string     `json:"stateName,omitempty"`
+}
+type ResponseReportList []ResponseReport
+
+type DbWaitForApprovReport struct {
+	SequencesNo      uint       `gorm:"column:SEQ_NO"`
+	ID               uint       `gorm:"column:ID"`
+	ContractID       uint       `gorm:"column:CONTRACT_ID"`
+	WorkName         string     `gorm:"column:WORK_NAME"`
+	ProjectShortName string     `gorm:"column:PROJECT_SHORT_NAME"`
+	ItemID           uint       `gorm:"column:ITEM_ID"`
+	ItemName         string     `gorm:"column:ITEM_NAME"`
+	DeliveryNumber   string     `gorm:"column:DELIVERY_NUMBER"`
+	Arrival          utils.Time `gorm:"column:ARRIVAL_DATE"`
+	Inspection       utils.Time `gorm:"column:INSPECTION_DATE"`
+}
+
+type DbWaitForApprovReports []DbWaitForApprovReport
+
+// func (ProgressReportDB) TableName() string {
+// 	return "CPM.RAD_LIST_PROGRESS_DOC"
+// }
+
+type SearchSortWaitForApprovReport struct {
+	request.Pagination
+	SequencesNo          string
+	DeliveryNumber       string
+	ItemName             string
+	WorkName             string
+	ProjectShortName     string
+	Arrival              string
+	Inspection           string
+	SortSequencesNo      string
+	SortDeliveryNumber   string
+	SortItemName         string
+	SortWorkName         string
+	SortProjectShortName string
+	SortArrival          string
+	SortInspection       string
+}
+
+func (db *DbWaitForApprovReport) ToResponse() ResponseReport {
+	return ResponseReport{
+		Seq:              db.SequencesNo,
+		ID:               db.ID,
+		DeliveryNumber:   db.DeliveryNumber,
+		WorkName:         db.WorkName,
+		ProjectShortName: db.ProjectShortName,
+		ItemID:           db.ItemID,
+		ItemName:         db.ItemName,
+		ArrivalDate:      db.Arrival,
+		InspectionDate:   db.Inspection,
+	}
+}
+
+func (p *DbWaitForApprovReports) ToResponse() []ResponseReport {
+	res := make([]ResponseReport, len(*p))
+	for i, item := range *p {
+		res[i] = item.ToResponse()
+	}
+	return res
+}

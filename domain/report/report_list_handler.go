@@ -117,3 +117,49 @@ func ParseCheckSearch(c echo.Context) CheckReportSearch {
 	}
 
 }
+
+type getWaitForApprovReportFunc func(context.Context, SearchSortWaitForApprovReport, uint) (ResponseReportList, int64, error)
+
+func (fn getWaitForApprovReportFunc) GetWaitForApprovReport(ctx context.Context, search SearchSortWaitForApprovReport, contractID uint) (ResponseReportList, int64, error) {
+	return fn(ctx, search, contractID)
+}
+
+func GetWaitForApprovReportHandler(svc getWaitForApprovReportFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		log := logger.Unwrap(c)
+
+		search := ParseSearchSortWaitForApprovReport(c)
+		data, total, err := svc.GetWaitForApprovReport(c.Request().Context(), search, utils.StringToUint(c.Param("contractid")))
+		if err != nil {
+			log.Error(err.Error())
+			return c.JSON(http.StatusNotFound, response.Error{Error: err.Error()})
+		}
+
+		return c.JSON(http.StatusOK, response.Data[ResponseReport]{
+			Data:  data,
+			Page:  search.GetPage(),
+			Limit: search.GetLimit(),
+			Total: total,
+		})
+	}
+}
+
+func ParseSearchSortWaitForApprovReport(c echo.Context) SearchSortWaitForApprovReport {
+	return SearchSortWaitForApprovReport{
+		Pagination:           request.GetPagination(utils.StringToInt(c.QueryParam("page")), utils.StringToInt(c.QueryParam("limit"))),
+		SequencesNo:          c.QueryParam("searchRowNo"),
+		DeliveryNumber:       c.QueryParam("searchDeliveryNumber"),
+		ItemName:             c.QueryParam("searchItemName"),
+		WorkName:             c.QueryParam("searchWorkName"),
+		ProjectShortName:     c.QueryParam("searchProjectShortName"),
+		Arrival:              c.QueryParam("searchArrival"),
+		Inspection:           c.QueryParam("searchInspection"),
+		SortSequencesNo:      c.QueryParam("sortRowNo"),
+		SortDeliveryNumber:   c.QueryParam("sortDeliveryNumber"),
+		SortItemName:         c.QueryParam("sortItemName"),
+		SortWorkName:         c.QueryParam("sortWorkName"),
+		SortProjectShortName: c.QueryParam("sortProjectShortName"),
+		SortArrival:          c.QueryParam("sortArrival"),
+		SortInspection:       c.QueryParam("sortInspection"),
+	}
+}
